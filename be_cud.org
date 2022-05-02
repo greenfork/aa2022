@@ -1,0 +1,16 @@
+* Business events and CUD events
+
+** Business events
+
+- Task created :: producer - Task tracker service, consumer - Accounting service
+- Task assigned :: producer - Task tracker service, consumer - self, Accounting service
+- Task closed :: producer - Task tracker service, consumer - Accounting service
+- Revenue email sent :: producer - Email service
+- Salary paid :: producer - Paying service, consumer - Accounting service
+
+** CUD events
+
+- Task reassign requested :: producer - Task tracker service, consumer - self
+- Daily revenue calculated :: producer - Accounting service, consumer - Paying, Email services
+- Balance increased :: producer - Accounting service, consumer - self, Analytics, Accounting dashboard services
+- Balance decreased :: producer - Accounting service, consumer - self, Analytics, Accounting dashboard services
