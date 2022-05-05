@@ -13,10 +13,10 @@
   UberPopug Inc (у нас там инновационная система авторизации на основе формы
   клюва).
 
-  + Actor: Authorization service
+  + Actor: Auth service
   + Command: Authorize
   + Query: User
-  + Event: User.RequestAuthorized
+  + Event: ???
 
 - В таск-трекере должны быть только задачи. Проектов, скоупов и спринтов нет,
   потому что они не умещаются в голове попуга.
@@ -31,9 +31,9 @@
   (выполнена или нет) и попуг, на которого заассайнена задача.
 
   + Actor: Employee
-  + Command: Create task
+  + Command: Add task
   + Query: -
-  + Event: Task.Created
+  + Event: Task added
   
 - Менеджеры или администраторы должны иметь кнопку «заассайнить задачи», которая
   возьмёт все открытые задачи и рандомно заассайнит каждую на любого из
@@ -41,9 +41,9 @@
   реассайна — сорян, делай следующую.
 
   + Actor: Manager, Admin
-  + Command: Reassign tasks
+  + Command: Shuffle tasks
   + Query: Tasks
-  + Event: Tasks.ReassignRequested
+  + Event: Tasks shuffled
   
 - a) Ассайнить задачу можно на кого угодно (кроме менеджера и администратора), это
 может быть любой существующий аккаунт из системы.
@@ -98,7 +98,8 @@
   + Actor: Employee
   + Command: Close task
   + Query: Task
-  + Event: Task.Closed
+  + Event: Task closed
+
 ** Accounting
 
 - Аккаунтинг должен быть в отдельном дашборде и доступным только для
@@ -106,7 +107,7 @@
   
   + Actor: Accountant, Admin
   + Command: -
-  + Query: Audit
+  + Query: Accounting log
   + Event: -
 
 - a) у обычных попугов доступ к аккаунтингу тоже должен быть. Но только к
@@ -117,25 +118,25 @@
 
   + Actor: Employee
   + Command: -
-  + Query: Audit
+  + Query: Accounting log
   + Event: -
 
 - Авторизация в дешборде аккаунтинга должна выполняться через общий сервис
   аутентификации UberPopug Inc.
   
-  + Actor: Authorization service
+  + Actor: Auth service
   + Command: Authorize
   + Query: User
-  + Event: User.RequestAuthorized
+  + Event: ???
 
 - У каждого из сотрудников должен быть свой счёт, который показывает, сколько за
   сегодня он получил денег. У счёта должен быть аудитлог того, за что были
   списаны или начислены деньги, с подробным описанием каждой из задач.
   
-  + Actor: Task.Closed
-  + Command: Insert balance increase record
-  + Query: Audit
-  + Event: Audit.BalanceIncreased
+  + Actor: Task closed
+  + Command: Record transaction
+  + Query: Accounting log
+  + Event: Transaction recorded
 
 - Расценки:
   + цены на задачу определяется единоразово, в момент появления в системе (можно
@@ -162,32 +163,32 @@
   
   + Actor: -
   + Command: -
-  + Query: Audit
+  + Query: Accounting log
   + Event: -
 
 - В конце дня необходимо:
   
 - a) считать сколько денег сотрудник получил за рабочий день
 
-  + Actor: Scheduler "end of day"
-  + Command: Calculate revenue
-  + Query: Audit
-  + Event: Revenue.Calculated
+  + Actor: Scheduler
+  + Command: Record payment transaction
+  + Query: Accounting log
+  + Event: Transaction recorded
 
 - b) отправлять на почту сумму выплаты.
 
-  + Actor: RevenueCalculated
+  + Actor: Transaction recorded (payment)
   + Command: Send email
   + Query: -
-  + Event: Revenue.EmailSent
+  + Event: ???
 
 - После выплаты баланса (в конце дня) он должен обнуляться, и в аудитлоге всех
   операций аккаунтинга должно быть отображено, что была выплачена сумма.
   
-  + Actor: RevenueCalculated
+  + Actor: Transaction recorded (payment)
   + Command: Pay daily salary
   + Query: -
-  + Event: Revenue.Paid
+  + Event: Salary paid
 
 - Дашборд должен выводить информацию по дням, а не за весь период сразу.  a)
   вообще хватит только за сегодня (всё равно попуги дальше не помнят), но если
@@ -195,15 +196,16 @@
 
   + Actor: Employee
   + Command: -
-  + Query: Audit
+  + Query: Accounting log
   + Event: -
+
 ** Analytics
 
 - Аналитика — это отдельный дашборд, доступный только админам.
 
   + Actor: Admin
   + Command: -
-  + Query: Audit, Employees
+  + Query: Accounting log, Employees
   + Event: -
   
 - Нужно указывать, сколько заработал топ-менеджмент за сегодня и сколько попугов
@@ -211,12 +213,12 @@
   
   + Actor: Admin
   + Command: -
-  + Query: Audit, Managers
+  + Query: Accounting log, Managers
   + Event: -
 
 - Нужно показывать самую дорогую задачу за день, неделю или месяц.
   
   + Actor: Admin
   + Command: -
-  + Query: Audit
+  + Query: Accounting log
   + Event: -
