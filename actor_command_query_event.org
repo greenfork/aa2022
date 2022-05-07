@@ -48,17 +48,17 @@
 - a) Ассайнить задачу можно на кого угодно (кроме менеджера и администратора), это
 может быть любой существующий аккаунт из системы.
 
-  + Actor: Tasks.ReassignRequested
-  + Command: Assign task
+  + Actor: Employee
+  + Command: -
   + Query: Task
-  + Event: Task.Assigned
+  + Event: -
 
 - b) Ассайнить задачу можно только кнопкой «заассайнить задачи»
 
-  + Actor: Tasks.ReassignRequested
-  + Command: Assign task
-  + Query: Task
-  + Event: Task.Assigned
+  + Actor: Manager, Admin
+  + Command: Shuffle tasks
+  + Query: Tasks
+  + Event: Tasks.Shuffled
 
 
 - c) При нажатии кнопки «заассайнить задачи» все текущие не закрытые задачи должны
