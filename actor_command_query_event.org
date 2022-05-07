@@ -107,7 +107,7 @@
   
   + Actor: Accountant, Admin
   + Command: -
-  + Query: Accounting log
+  + Query: Transactions
   + Event: -
 
 - a) у обычных попугов доступ к аккаунтингу тоже должен быть. Но только к
@@ -118,7 +118,7 @@
 
   + Actor: Employee
   + Command: -
-  + Query: Accounting log
+  + Query: Transactions
   + Event: -
 
 - Авторизация в дешборде аккаунтинга должна выполняться через общий сервис
@@ -134,9 +134,9 @@
   списаны или начислены деньги, с подробным описанием каждой из задач.
   
   + Actor: Task closed
-  + Command: Record transaction
-  + Query: Accounting log
-  + Event: Transaction recorded
+  + Command: Apply transaction
+  + Query: Transactions
+  + Event: Transaction applied
 
 - Расценки:
   + цены на задачу определяется единоразово, в момент появления в системе (можно
@@ -163,7 +163,7 @@
   
   + Actor: -
   + Command: -
-  + Query: Accounting log
+  + Query: Transactions
   + Event: -
 
 - В конце дня необходимо:
@@ -171,13 +171,13 @@
 - a) считать сколько денег сотрудник получил за рабочий день
 
   + Actor: Scheduler
-  + Command: Record payment transaction
-  + Query: Accounting log
-  + Event: Transaction recorded
+  + Command: Apply payment transaction
+  + Query: Transactions
+  + Event: Transaction applied
 
 - b) отправлять на почту сумму выплаты.
 
-  + Actor: Transaction recorded (payment)
+  + Actor: Transaction applied (payment)
   + Command: Send email
   + Query: -
   + Event: ???
@@ -185,7 +185,7 @@
 - После выплаты баланса (в конце дня) он должен обнуляться, и в аудитлоге всех
   операций аккаунтинга должно быть отображено, что была выплачена сумма.
   
-  + Actor: Transaction recorded (payment)
+  + Actor: Transaction applied (payment)
   + Command: Pay daily salary
   + Query: -
   + Event: Salary paid
@@ -196,7 +196,7 @@
 
   + Actor: Employee
   + Command: -
-  + Query: Accounting log
+  + Query: Transactions
   + Event: -
 
 ** Analytics
@@ -205,7 +205,7 @@
 
   + Actor: Admin
   + Command: -
-  + Query: Accounting log, Employees
+  + Query: Transactions, Employees
   + Event: -
   
 - Нужно указывать, сколько заработал топ-менеджмент за сегодня и сколько попугов
@@ -213,12 +213,12 @@
   
   + Actor: Admin
   + Command: -
-  + Query: Accounting log, Managers
+  + Query: Transactions, Managers
   + Event: -
 
 - Нужно показывать самую дорогую задачу за день, неделю или месяц.
   
   + Actor: Admin
   + Command: -
-  + Query: Accounting log
+  + Query: Transactions
   + Event: -
