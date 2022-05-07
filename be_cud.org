@@ -1,0 +1,24 @@
+* Business events and CUD events
+
+Services:
+- Auth
+- Analytics
+- Accounting dashboard
+- Accounting
+- Task tracker
+
+** Business events
+
+- Account registered :: Auth -> nothing
+- Task added :: Task tracker -> self, Accounting
+- Task closed :: Task tracker -> self, Accounting
+- Tasks shuffled :: Task tracker -> self, Accounting
+- Salary paid :: Accounting -> nothing
+- Transaction applied :: Accounting -> self, Analytics
+
+** CUD events
+
+- Account created :: Auth -> self, Analytics, Accounting, Accounting dashboard, Task tracker
+- Task created :: Task tracker -> self, Accounting
+- Task assigned :: Task tracker -> self, Accounting
+- Transaction created :: Accounting -> Accounting dashboard, Analytics
