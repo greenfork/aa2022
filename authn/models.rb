@@ -25,5 +25,5 @@ end
 
 unless ENV["RACK_ENV"] == "development"
   Sequel::Model.freeze_descendents
-  DB.freeze
+  # DB.freeze
 end

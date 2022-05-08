@@ -2,10 +2,9 @@
 
 require_relative "spec_helper"
 
-describe Model1 do
+describe Account do
   it "should " do
-    obj = Model1.new
+    obj = Account.new
     obj.id.must_be_nil
-    # ...
   end
 end

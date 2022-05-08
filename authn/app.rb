@@ -78,13 +78,23 @@ class Authn < Roda
          # cookie_options: {secure: ENV['RACK_ENV'] != 'test'}, # Uncomment if only allowing https:// access
          secret: ENV.send((ENV["RACK_ENV"] == "development" ? :[] : :delete), "AUTHN_SESSION_SECRET")
 
+  plugin :rodauth do
+    enable :login, :logout, :oauth
+    account_password_hash_column :password_hash
+    oauth_application_scopes %w[tasks.write analytics.read accounting.read accounting.write]
+  end
+
   route do |r|
     r.public
     r.assets
     check_csrf!
+    r.rodauth
 
     r.root do
       view "index"
     end
+
+    rodauth.require_authentication
+    rodauth.oauth_applications
   end
 end

@@ -2,10 +2,9 @@
 
 require_relative "spec_helper"
 
-describe "/prefix1" do
+describe "/accounts" do
   it "should " do
-    visit "/prefix1"
+    visit "/"
     page.title.must_equal "Authn"
-    # ...
   end
 end

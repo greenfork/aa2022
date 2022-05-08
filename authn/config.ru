@@ -13,8 +13,7 @@ require_relative "models"
 Unreloader.require("app.rb") { "Authn" }
 run(dev ? Unreloader : Authn.freeze.app)
 
-freeze_core = false
-# freeze_core = !dev # Uncomment to enable refrigerator
+freeze_core = !dev # Uncomment to enable refrigerator
 if freeze_core
   begin
     require "refrigerator"
@@ -32,8 +31,9 @@ if freeze_core
     # require 'webrick'
 
     # rackup -s Puma
-    # require 'yaml'
-    # Gem.ruby
+    require "yaml"
+    require "puma/puma_http11"
+    require "nio"
 
     # Puma (needed for state file)
     # require 'yaml'
