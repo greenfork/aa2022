@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative "models"
+require_relative "producer"
 
 require "roda"
 require "tilt/sass"
@@ -85,6 +86,22 @@ class Authn < Roda
       profile.read tasks.write analytics.read accounting.read accounting.write
     ]
     oauth_valid_uri_schemes %w[http https]
+
+    after_create_account do
+      acc = Account.first(id: account[:id])
+      Producer.call(
+        {
+          name: "AccountCreated",
+          data: {
+            public_id: acc[:public_id],
+            email: acc[:email],
+            full_name: acc[:full_name],
+            role: acc[:role]
+          }
+        },
+        topic: "accounts-stream"
+      )
+    end
   end
 
   route do |r|
@@ -127,13 +144,43 @@ class Authn < Roda
             view "edit", locals: { account: Account.first(id:) }
           end
           r.post do
-            Account.first(id:).update(full_name: r.params["name"], role: r.params["role"])
+            acc = Account.first(id:)
+            new_role = acc.role == r.params["role"] ? nil : r.params["role"]
+            acc.update(full_name: r.params["name"], role: r.params["role"])
+            Producer.call(
+              {
+                name: "AccountUpdated",
+                data: {
+                  public_id: acc[:public_id],
+                  email: acc[:email],
+                  full_name: acc[:full_name]
+                }
+              },
+              topic: "accounts-stream"
+            )
+            if new_role
+              Producer.call(
+                {
+                  name: "AccountRoleChanged",
+                  data: { public_id: acc[:public_id], role: new_role }
+                },
+                topic: "accounts"
+              )
+            end
             r.redirect "/accounts"
           end
         end
 
         r.is "delete", method: "post" do
-          Account.first(id:).destroy
+          acc = Account.first(id:)
+          acc.destroy
+          Producer.call(
+            {
+              name: "AccountDeleted",
+              data: { public_id: acc.public_id }
+            },
+            topic: "accounts-stream"
+          )
           r.redirect "/accounts"
         end
       end
