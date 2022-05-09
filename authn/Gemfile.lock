@@ -42,7 +42,7 @@ GEM
     rodauth (2.23.0)
       roda (>= 2.6.0)
       sequel (>= 4)
-    rodauth-oauth (0.9.0)
+    rodauth-oauth (0.9.1)
       rodauth (~> 2.0)
     sassc (2.4.0)
       ffi (~> 1.9)
@@ -72,7 +72,7 @@ DEPENDENCIES
   refrigerator (>= 1)
   roda (>= 3.50)
   rodauth
-  rodauth-oauth
+  rodauth-oauth (>= 0.9.1)
   sassc (>= 2)
   sequel (>= 5)
   sequel-annotate
