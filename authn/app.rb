@@ -77,7 +77,7 @@ class Authn < Roda
          secret: ENV.send((ENV["RACK_ENV"] == "development" ? :[] : :delete), "AUTHN_SESSION_SECRET")
 
   plugin :rodauth do
-    enable :login, :logout, :oauth
+    enable :login, :logout, :create_account, :oauth
     account_password_hash_column :password_hash
     login_return_to_requested_location? true
     oauth_application_scopes %w[tasks.write analytics.read accounting.read accounting.write]
@@ -89,11 +89,39 @@ class Authn < Roda
     check_csrf!
     r.rodauth
 
-    r.root do
-      view "index"
-    end
-
     rodauth.require_authentication
     rodauth.oauth_applications
+    rodauth.oauth_tokens
+
+    r.root do
+      r.redirect "accounts"
+    end
+
+    r.on "accounts" do
+      @page_title = "Accounts"
+
+      r.is do
+        view "index", locals: { accounts: Account.all }
+      end
+
+      r.on Integer do |id|
+        @page_title = "Account ##{id}"
+
+        r.is do
+          r.get do
+            view "edit", locals: { account: Account.first(id:) }
+          end
+          r.post do
+            Account.first(id:).update(full_name: r.params["name"], role: r.params["role"])
+            r.redirect "/accounts"
+          end
+        end
+
+        r.is "delete", method: "post" do
+          Account.first(id:).destroy
+          r.redirect "/accounts"
+        end
+      end
+    end
   end
 end

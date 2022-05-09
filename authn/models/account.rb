@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class Account < Sequel::Model
+  ROLES = %w[employee manager accountant admin].freeze
 end
 
 # rubocop:disable Layout/LineLength, Lint/MissingCopEnableDirective
