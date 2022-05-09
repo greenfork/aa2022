@@ -22,7 +22,7 @@ class Minitest::HooksSpec
   end
 end
 
-freeze_core = false # change to true to enable refrigerator
+freeze_core = true # change to true to enable refrigerator
 if freeze_core
   at_exit do
     require "refrigerator"
