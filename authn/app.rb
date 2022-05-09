@@ -81,6 +81,7 @@ class Authn < Roda
   plugin :rodauth do
     enable :login, :logout, :oauth
     account_password_hash_column :password_hash
+    login_return_to_requested_location? true
     oauth_application_scopes %w[tasks.write analytics.read accounting.read accounting.write]
   end
 
