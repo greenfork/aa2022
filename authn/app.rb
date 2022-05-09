@@ -31,6 +31,7 @@ class Authn < Roda
   plugin :assets, css: "app.scss", css_opts: { style: :compressed, cache: false }, timestamp_paths: true
   plugin :render, escape: true, layout: "./layout"
   plugin :public
+  plugin :json
 
   logger = if ENV["RACK_ENV"] == "test"
              Class.new { def write(_) end }.new
@@ -80,7 +81,10 @@ class Authn < Roda
     enable :login, :logout, :create_account, :oauth
     account_password_hash_column :password_hash
     login_return_to_requested_location? true
-    oauth_application_scopes %w[tasks.write analytics.read accounting.read accounting.write]
+    oauth_application_scopes %w[
+      profile.read tasks.write analytics.read accounting.read accounting.write
+    ]
+    oauth_valid_uri_schemes %w[http https]
   end
 
   route do |r|
@@ -89,12 +93,23 @@ class Authn < Roda
     check_csrf!
     r.rodauth
 
+    r.root do
+      r.redirect "accounts"
+    end
+
     rodauth.require_authentication
     rodauth.oauth_applications
     rodauth.oauth_tokens
 
-    r.root do
-      r.redirect "accounts"
+    r.is "accounts/current" do
+      # rodauth.require_oauth_authorization("profile.read")
+      acc = rodauth.account_from_session
+      {
+        public_id: acc[:public_id],
+        email: acc[:email],
+        full_name: acc[:full_name],
+        role: acc[:role]
+      }
     end
 
     r.on "accounts" do
