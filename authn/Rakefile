@@ -106,3 +106,19 @@ task "annotate" do
   require "sequel/annotate"
   Sequel::Annotate.annotate(Dir["models/**/*.rb"])
 end
+
+desc "Seed database with data for testing in development"
+task "seed" do
+  require "bcrypt"
+  ENV["RACK_ENV"] = "development"
+  require_relative "models"
+
+  Account.truncate(cascade: true)
+  Account.create(
+    full_name: "Ivan Grozny",
+    role: "admin",
+    email: "admin@authn.com",
+    status_id: 2,
+    password_hash: BCrypt::Password.create("admin").to_s
+  )
+end
