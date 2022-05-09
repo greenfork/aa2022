@@ -71,8 +71,6 @@ class Authn < Roda
     end
   end
 
-  require_relative ".env"
-
   plugin :sessions,
          key: "_Authn.session",
          # cookie_options: {secure: ENV['RACK_ENV'] != 'test'}, # Uncomment if only allowing https:// access
