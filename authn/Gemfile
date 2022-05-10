@@ -17,6 +17,7 @@ gem "sassc", ">= 2"
 gem "sequel", ">= 5"
 gem "sequel_pg", ">= 1.8", require: "sequel"
 gem "tilt", ">= 2.0.9"
+gem "waterdrop"
 
 group :development do
   gem "sequel-annotate"

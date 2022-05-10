@@ -8,6 +8,9 @@ Style/StringLiterals:
 Style/ClassAndModuleChildren:
   EnforcedStyle: compact
 
+Style/IfUnlessModifier:
+  Enabled: false
+
 Metrics/MethodLength:
   Enabled: false
 
