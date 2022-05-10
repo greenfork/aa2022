@@ -129,7 +129,31 @@ class TaskTracker < Roda
         end
         r.post do
           random_employee_public_id = Account.random_employees.get(:public_id)
-          Task.create(assignee_public_id: random_employee_public_id, description: "Lorem ipsum")
+          task = Task.create(assignee_public_id: random_employee_public_id, description: "Lorem ipsum")
+          Producer.call(
+            {
+              name: "TaskCreated",
+              data: {
+                public_id: task.public_id,
+                actor_public_id: @current_account.public_id,
+                description: task.description,
+                assignee_public_id: task.assignee_public_id,
+                status: task.status
+              }
+            },
+            topic: "tasks-stream"
+          )
+          Producer.call(
+            {
+              name: "TaskAdded",
+              data: {
+                public_id: task.public_id,
+                actor_public_id: @current_account.public_id,
+                assignee_public_id: task.assignee_public_id
+              }
+            },
+            topic: "tasks"
+          )
           r.redirect "/tasks"
         end
       end
@@ -140,13 +164,59 @@ class TaskTracker < Roda
 
       r.is Integer, "close" do |id|
         task = Task.first(id:)
-        task.close if can_close?(task)
+        if can_close?(task)
+          task.close
+          Producer.call(
+            {
+              name: "TaskStatusUpdated",
+              data: {
+                actor_public_id: @current_account.public_id,
+                public_id: task.public_id,
+                status: task.status
+              }
+            },
+            topic: "tasks-stream"
+          )
+          Producer.call(
+            {
+              name: "TaskClosed",
+              data: {
+                actor_public_id: @current_account.public_id,
+                public_id: task.public_id
+              }
+            },
+            topic: "tasks"
+          )
+        end
         r.redirect "/tasks"
       end
 
       r.is "shuffle", method: "post" do
         if can_shuffle?
-          Task.shuffle
+          shuffled_tasks = Task.shuffle
+          shuffled_tasks.each do |task|
+            Producer.call(
+              {
+                name: "TaskStatusUpdated",
+                data: {
+                  actor_public_id: @current_account.public_id,
+                  public_id: task[:public_id],
+                  assignee_public_id: task[:assignee_public_id]
+                }
+              },
+              topic: "tasks-stream"
+            )
+          end
+          Producer.call(
+            {
+              name: "TasksShuffled",
+              data: {
+                actor_public_id: @current_account.public_id,
+                public_ids: shuffled_tasks.map { _1[:public_id] }
+              }
+            },
+            topic: "tasks"
+          )
         else
           flash[:error] = "Not authorized"
         end

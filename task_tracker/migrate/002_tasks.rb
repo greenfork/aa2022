@@ -10,6 +10,7 @@ Sequel.migration do
       String :description, null: false, default: ""
       task_status :status, null: false, default: "open"
       uuid :assignee_public_id, null: false
+      uuid :public_id, null: false, unique: true, default: Sequel.function(:gen_random_uuid)
     end
   end
 

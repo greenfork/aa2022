@@ -12,7 +12,9 @@ class Task < Sequel::Model
       .limit(1)
       .select(:public_id)
       .order(Sequel.lit("random() + tasks.id")) # force re-execution of a subquery
-    where(status: "open").update(assignee_public_id: random_employee_public_id)
+    where(status: "open")
+      .returning(:public_id, :assignee_public_id)
+      .update(assignee_public_id: random_employee_public_id)
   end
 
   def close

@@ -12,6 +12,7 @@ end
 require "rack/unreloader"
 Unreloader = Rack::Unreloader.new(subclasses: %w[Roda Sequel::Model], logger:, reload: dev) { TaskTracker }
 require_relative "models"
+Unreloader.require("producer.rb") { "Producer" }
 Unreloader.require("app.rb") { "TaskTracker" }
 
 unless ENV["RACK_ENV"] == "development"
