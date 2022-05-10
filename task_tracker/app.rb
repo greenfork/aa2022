@@ -91,21 +91,72 @@ class TaskTracker < Roda
     r.assets
     check_csrf!
 
-    r.root do
-      @logged_in = !session["access_token"].nil?
+    #
+    # Authentication
+    #
+    @logged_in = !session["access_token"].nil?
+    if (token = session["access_token"])
+      session["account"] ||= json_request(
+        :get,
+        "#{AUTHN_URL}/accounts/current",
+        headers: { "authorization" => "Bearer #{token}" }
+      )
+      @current_account = Account.first(public_id: session["account"]["public_id"])
+      if @current_account.nil?
+        clear_session
+        @logged_in = false
+      end
+    end
 
-      if (token = session["access_token"])
-        session["account"] ||= json_request(
-          :get,
-          "#{AUTHN_URL}/accounts/current",
-          headers: { "authorization" => "Bearer #{token}" }
-        )
-        @account = session["account"].transform_keys(&:to_sym)
-        view "index"
+    r.root do
+      if @logged_in
+        r.redirect "/tasks"
       else
         view inline: "You are not authorized"
       end
     end
+
+    #
+    # CRUD
+    #
+
+    r.on "tasks" do
+      @page_title = "Tasks"
+
+      r.is do
+        r.get do
+          view "index", locals: { tasks: Task.eager(:account).all }
+        end
+        r.post do
+          random_employee_public_id = Account.random_employees.get(:public_id)
+          Task.create(assignee_public_id: random_employee_public_id, description: "Lorem ipsum")
+          r.redirect "/tasks"
+        end
+      end
+
+      r.is "my" do
+        view "index", locals: { tasks: @current_account.tasks }
+      end
+
+      r.is Integer, "close" do |id|
+        task = Task.first(id:)
+        task.close if can_close?(task)
+        r.redirect "/tasks"
+      end
+
+      r.is "shuffle", method: "post" do
+        if can_shuffle?
+          Task.shuffle
+        else
+          flash[:error] = "Not authorized"
+        end
+        r.redirect "/tasks"
+      end
+    end
+
+    #
+    # OAuth
+    #
 
     r.is "authorize", method: "post" do
       #
@@ -164,8 +215,8 @@ class TaskTracker < Roda
         }
       )
 
-      session["access_token"] = response[:access_token]
-      session["refresh_token"] = response[:refresh_token]
+      session["access_token"] = response["access_token"]
+      session["refresh_token"] = response["refresh_token"]
 
       r.redirect "/"
     end
@@ -174,6 +225,8 @@ class TaskTracker < Roda
       #
       # This endpoint uses the OAuth revoke endpoint to invalidate an access token.
       #
+      access_token = session.delete("access_token")
+      clear_session
       begin
         json_request(
           :post,
@@ -182,22 +235,27 @@ class TaskTracker < Roda
             "client_id" => CLIENT_ID,
             "client_secret" => CLIENT_SECRET,
             "token_type_hint" => "access_token",
-            "token" => session["access_token"]
+            "token" => access_token
           }
         )
-      rescue StandardError
-        raise unless ENV["RACK_ENV"] == "production"
+      rescue StandardError => e
+        logger.warn "Revocation error: #{e.message}"
       end
 
-      session.delete("access_token")
-      session.delete("refresh_token")
-      session.delete("account")
       flash["notice"] = "You are logged out!"
       r.redirect "/"
     end
   end
 
   private
+
+  def can_close?(task)
+    task.status == "open" && task.assignee_public_id == @current_account.public_id
+  end
+
+  def can_shuffle?
+    @current_account.role == "manager" || @current_account.role == "admin"
+  end
 
   def json_request(meth, uri, headers: {}, params: {})
     uri = URI(uri)
@@ -212,7 +270,7 @@ class TaskTracker < Roda
       response = http.request(request)
       raise "Unexpected error on token generation, #{response.body}" unless response.code.to_i == 200
 
-      JSON.parse(response.body, symbolize_names: true)
+      JSON.parse(response.body)
     when :post
       request = Net::HTTP::Post.new(uri.request_uri)
       request.body = JSON.dump(params)
@@ -224,7 +282,7 @@ class TaskTracker < Roda
       response = http.request(request)
       raise "Unexpected error on token generation, #{response.body}" unless response.code.to_i == 200
 
-      JSON.parse(response.body, symbolize_names: true)
+      JSON.parse(response.body)
     end
   end
 end

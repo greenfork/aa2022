@@ -9,7 +9,7 @@ Sequel.migration do
       primary_key :id
       String :description, null: false, default: ""
       task_status :status, null: false, default: "open"
-      uuid :account_public_id, null: false
+      uuid :assignee_public_id, null: false
     end
   end
 

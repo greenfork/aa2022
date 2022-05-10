@@ -2,6 +2,22 @@
 
 class Task < Sequel::Model
   STATUSES = %w[open closed].freeze
+
+  many_to_one :account, primary_key: :public_id, key: :assignee_public_id
+
+  def self.shuffle
+    random_employee_public_id =
+      Account
+      .random_employees
+      .limit(1)
+      .select(:public_id)
+      .order(Sequel.lit("random() + tasks.id")) # force re-execution of a subquery
+    where(status: "open").update(assignee_public_id: random_employee_public_id)
+  end
+
+  def close
+    update(status: "closed")
+  end
 end
 
 # Table: tasks
