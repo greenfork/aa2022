@@ -12,6 +12,21 @@
     <nav class="navbar navbar-expand navbar-light bg-light" role="navigation">
       <div class="container">
         <a class="navbar-brand" href="/">Task tracker</a>
+        <div class="collapse navbar-collapse">
+          <div class="ms-auto">
+            <% if @logged_in %>
+              <form action="/logout" method="post">
+                <%== csrf_tag("/logout") %>
+                <input class="btn btn-outline-primary" type="submit" value="Logout" />
+              </form>
+            <% else %>
+              <form action="/authorize" method="post">
+                <%== csrf_tag("/authorize") %>
+                <button class="btn btn-outline-success" type="submit">Authorize</button>
+              </form>
+            <% end %>
+          </div>
+        </div>
       </div>
     </nav>
 
