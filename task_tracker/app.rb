@@ -191,6 +191,7 @@ class TaskTracker < Roda
 
       session.delete("access_token")
       session.delete("refresh_token")
+      session.delete("account")
       flash["notice"] = "You are logged out!"
       r.redirect "/"
     end
