@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require_relative "models"
-require_relative "producer"
 
 require "roda"
 require "tilt/sass"
@@ -20,7 +19,7 @@ class Authn < Roda
   plugin :content_security_policy do |csp|
     csp.default_src :none
     csp.style_src :self, "https://cdn.jsdelivr.net"
-    csp.form_action :self
+    csp.form_action "*"
     csp.script_src :self
     csp.connect_src :self
     csp.base_uri :none
@@ -78,13 +77,11 @@ class Authn < Roda
          # cookie_options: {secure: ENV['RACK_ENV'] != 'test'}, # Uncomment if only allowing https:// access
          secret: ENV.send((ENV["RACK_ENV"] == "development" ? :[] : :delete), "AUTHN_SESSION_SECRET")
 
-  plugin :rodauth do
+  plugin :rodauth, json: true do
     enable :login, :logout, :create_account, :oauth
     account_password_hash_column :password_hash
     login_return_to_requested_location? true
-    oauth_application_scopes %w[
-      profile.read tasks.write analytics.read accounting.read accounting.write
-    ]
+    oauth_application_scopes %w[profile.read]
     oauth_valid_uri_schemes %w[http https]
 
     after_create_account do
@@ -107,19 +104,14 @@ class Authn < Roda
   route do |r|
     r.public
     r.assets
-    check_csrf!
     r.rodauth
 
     r.root do
       r.redirect "accounts"
     end
 
-    rodauth.require_authentication
-    rodauth.oauth_applications
-    rodauth.oauth_tokens
-
     r.is "accounts/current" do
-      # rodauth.require_oauth_authorization("profile.read")
+      rodauth.require_oauth_authorization("profile.read")
       acc = rodauth.account_from_session
       {
         public_id: acc[:public_id],
@@ -128,6 +120,11 @@ class Authn < Roda
         role: acc[:role]
       }
     end
+
+    rodauth.require_authentication
+    rodauth.oauth_applications
+    rodauth.oauth_tokens
+    check_csrf!
 
     r.on "accounts" do
       @page_title = "Accounts"

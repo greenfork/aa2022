@@ -107,18 +107,35 @@ task "annotate" do
   Sequel::Annotate.annotate(Dir["models/**/*.rb"])
 end
 
+SALT = "$2a$12$g1aexwSiRnKS3pd.56MZEO"
+TASK_TRACKER_CLIENT_ID = "TASK_TRACKER_CLIENT_ID"
+
 desc "Seed database with data for testing in development"
 task "seed" do
   require "bcrypt"
   ENV["RACK_ENV"] = "development"
   require_relative "models"
 
+  email = "admin@authn.com"
+
   Account.truncate(cascade: true)
-  Account.create(
+  account = Account.create(
     full_name: "Ivan Grozny",
     role: "admin",
-    email: "admin@authn.com",
+    email:,
     status_id: 2,
     password_hash: BCrypt::Password.create("admin").to_s
+  )
+
+  DB[:oauth_applications].truncate(cascade: true)
+  DB[:oauth_applications].insert(
+    client_id: TASK_TRACKER_CLIENT_ID,
+    client_secret: BCrypt::Engine.hash_secret(TASK_TRACKER_CLIENT_ID, SALT),
+    name: "Task tracker",
+    description: "Application to make popugs work",
+    redirect_uri: "http://localhost:9297/callback",
+    homepage_url: "http://localhost:9297",
+    scopes: "profile.read",
+    account_id: account.id
   )
 end
