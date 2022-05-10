@@ -309,7 +309,7 @@ class TaskTracker < Roda
           }
         )
       rescue StandardError => e
-        logger.warn "Revocation error: #{e.message}"
+        puts "Revocation error: #{e.message}"
       end
 
       flash["notice"] = "You are logged out!"
