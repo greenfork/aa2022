@@ -10,7 +10,7 @@ Sequel.migration do
     alter_table :accounts do
       add_column :full_name, String, null: false, default: ""
       add_column :role, :account_role, null: false, default: "employee"
-      add_column :public_id, :uuid, null: false, default: Sequel.function(:gen_random_uuid)
+      add_column :public_id, :uuid, null: false, unique: true, default: Sequel.function(:gen_random_uuid)
     end
   end
 

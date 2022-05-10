@@ -106,3 +106,29 @@ task "annotate" do
   require "sequel/annotate"
   Sequel::Annotate.annotate(Dir["models/**/*.rb"])
 end
+
+UUID = "045f2304-dd2d-44fe-bd22-f3bd5aa01e86"
+
+desc "Seed database with data for testing in development"
+task "seed" do
+  require "securerandom"
+  ENV["RACK_ENV"] = "development"
+  require_relative "models"
+
+  email = "admin@authn.com"
+
+  DB.transaction do
+    Account.truncate(cascade: true)
+    account = Account.create(
+      full_name: "Ivan Grozny",
+      role: "admin",
+      email:,
+      public_id: UUID
+    )
+
+    Task.truncate
+    Task.create(account_public_id: account.public_id, description: "My first task")
+    Task.create(account_public_id: account.public_id, description: "My second task")
+    Task.create(account_public_id: account.public_id, description: "My third task")
+  end
+end

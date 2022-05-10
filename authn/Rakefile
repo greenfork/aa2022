@@ -109,6 +109,7 @@ end
 
 SALT = "$2a$12$g1aexwSiRnKS3pd.56MZEO"
 TASK_TRACKER_CLIENT_ID = "TASK_TRACKER_CLIENT_ID"
+UUID = "045f2304-dd2d-44fe-bd22-f3bd5aa01e86"
 
 desc "Seed database with data for testing in development"
 task "seed" do
@@ -118,24 +119,27 @@ task "seed" do
 
   email = "admin@authn.com"
 
-  Account.truncate(cascade: true)
-  account = Account.create(
-    full_name: "Ivan Grozny",
-    role: "admin",
-    email:,
-    status_id: 2,
-    password_hash: BCrypt::Password.create("admin").to_s
-  )
+  DB.transaction do
+    Account.truncate(cascade: true)
+    account = Account.create(
+      full_name: "Ivan Grozny",
+      role: "admin",
+      email:,
+      status_id: 2,
+      password_hash: BCrypt::Password.create("password", cost: BCrypt::Engine::MIN_COST).to_s,
+      public_id: UUID
+    )
 
-  DB[:oauth_applications].truncate(cascade: true)
-  DB[:oauth_applications].insert(
-    client_id: TASK_TRACKER_CLIENT_ID,
-    client_secret: BCrypt::Engine.hash_secret(TASK_TRACKER_CLIENT_ID, SALT),
-    name: "Task tracker",
-    description: "Application to make popugs work",
-    redirect_uri: "http://localhost:9297/callback",
-    homepage_url: "http://localhost:9297",
-    scopes: "profile.read",
-    account_id: account.id
-  )
+    DB[:oauth_applications].truncate(cascade: true)
+    DB[:oauth_applications].insert(
+      client_id: TASK_TRACKER_CLIENT_ID,
+      client_secret: BCrypt::Engine.hash_secret(TASK_TRACKER_CLIENT_ID, SALT),
+      name: "Task tracker",
+      description: "Application to make popugs work",
+      redirect_uri: "http://localhost:9297/callback",
+      homepage_url: "http://localhost:9297",
+      scopes: "profile.read",
+      account_id: account.id
+    )
+  end
 end
