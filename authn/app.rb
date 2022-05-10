@@ -110,6 +110,10 @@ class Authn < Roda
       r.redirect "accounts"
     end
 
+    #
+    # Endpoint to respond to all other services for SSO.
+    #
+
     r.is "accounts/current" do
       rodauth.require_oauth_authorization("profile.read")
       acc = rodauth.account_from_session
@@ -125,6 +129,10 @@ class Authn < Roda
     rodauth.oauth_applications
     rodauth.oauth_tokens
     check_csrf!
+
+    #
+    # CRUD for accounts
+    #
 
     r.on "accounts" do
       @page_title = "Accounts"
