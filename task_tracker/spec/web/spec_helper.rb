@@ -29,6 +29,9 @@ end
 Capybara.app = TaskTracker.freeze.app
 Capybara.exact = true
 
+Sequel::Model.freeze_descendents
+DB.freeze
+
 class Minitest::HooksSpec
   include Rack::Test::Methods
   include Capybara::DSL

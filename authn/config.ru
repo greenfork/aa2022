@@ -14,6 +14,12 @@ Unreloader = Rack::Unreloader.new(subclasses: %w[Roda Sequel::Model], logger:, r
 require_relative "models"
 Unreloader.require("producer.rb") { "Producer" }
 Unreloader.require("app.rb") { "Authn" }
+
+unless dev
+  Sequel::Model.freeze_descendents
+  DB.freeze
+end
+
 run(dev ? Unreloader : Authn.freeze.app)
 
 freeze_core = !dev # Uncomment to enable refrigerator
