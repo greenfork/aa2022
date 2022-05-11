@@ -153,7 +153,7 @@ class TaskTracker < Roda
                 assignee_public_id: task.assignee_public_id
               }
             },
-            topic: "tasks-lifecycle"
+            topic: "task-lifecycle"
           )
           r.redirect "/tasks"
         end
@@ -175,7 +175,7 @@ class TaskTracker < Roda
                 public_id: task.public_id
               }
             },
-            topic: "tasks-lifecycle"
+            topic: "task-lifecycle"
           )
         end
         r.redirect "/tasks"
@@ -195,7 +195,7 @@ class TaskTracker < Roda
                 }
               }
             end,
-            topic: "tasks-lifecycle"
+            topic: "task-lifecycle"
           )
         else
           flash[:error] = "Not authorized"
