@@ -169,7 +169,7 @@ class Authn < Roda
                   name: "AccountRoleChanged",
                   data: { public_id: acc[:public_id], role: new_role }
                 },
-                topic: "accounting"
+                topic: "account-access-control"
               )
             end
             r.redirect "/accounts"

@@ -152,7 +152,7 @@ class TaskTracker < Roda
                 assignee_public_id: task.assignee_public_id
               }
             },
-            topic: "tasks"
+            topic: "task-lifecycle"
           )
           r.redirect "/tasks"
         end
@@ -185,7 +185,7 @@ class TaskTracker < Roda
                 public_id: task.public_id
               }
             },
-            topic: "tasks"
+            topic: "task-lifecycle"
           )
         end
         r.redirect "/tasks"
@@ -215,7 +215,7 @@ class TaskTracker < Roda
                 public_ids: shuffled_tasks.map { _1[:public_id] }
               }
             },
-            topic: "tasks"
+            topic: "task-lifecycle"
           )
         else
           flash[:error] = "Not authorized"
