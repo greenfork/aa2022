@@ -94,6 +94,7 @@ class TaskTracker < Roda
     #
     # Authentication
     #
+
     @logged_in = !session["access_token"].nil?
     if (token = session["access_token"])
       session["account"] ||= json_request(
@@ -152,7 +153,7 @@ class TaskTracker < Roda
                 assignee_public_id: task.assignee_public_id
               }
             },
-            topic: "task-lifecycle"
+            topic: "tasks-lifecycle"
           )
           r.redirect "/tasks"
         end
@@ -168,24 +169,13 @@ class TaskTracker < Roda
           task.close
           Producer.call(
             {
-              name: "TaskStatusUpdated",
-              data: {
-                actor_public_id: @current_account.public_id,
-                public_id: task.public_id,
-                status: task.status
-              }
-            },
-            topic: "tasks-stream"
-          )
-          Producer.call(
-            {
               name: "TaskClosed",
               data: {
                 actor_public_id: @current_account.public_id,
                 public_id: task.public_id
               }
             },
-            topic: "task-lifecycle"
+            topic: "tasks-lifecycle"
           )
         end
         r.redirect "/tasks"
@@ -194,28 +184,18 @@ class TaskTracker < Roda
       r.is "shuffle", method: "post" do
         if can_shuffle?
           shuffled_tasks = Task.shuffle
-          shuffled_tasks.each do |task|
-            Producer.call(
+          Producer.produce_many_single_topic(
+            shuffled_tasks.map do |task|
               {
-                name: "TaskStatusUpdated",
+                name: "TaskShuffled",
                 data: {
                   actor_public_id: @current_account.public_id,
                   public_id: task[:public_id],
                   assignee_public_id: task[:assignee_public_id]
                 }
-              },
-              topic: "tasks-stream"
-            )
-          end
-          Producer.call(
-            {
-              name: "TasksShuffled",
-              data: {
-                actor_public_id: @current_account.public_id,
-                public_ids: shuffled_tasks.map { _1[:public_id] }
               }
-            },
-            topic: "task-lifecycle"
+            end,
+            topic: "tasks-lifecycle"
           )
         else
           flash[:error] = "Not authorized"

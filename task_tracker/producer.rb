@@ -11,4 +11,11 @@ class Producer
     puts "*" * 80
     BROKER.produce_sync(topic:, payload: json_event)
   end
+
+  def self.produce_many_single_topic(events, topic:)
+    puts "*" * 80
+    puts "Send to #{topic}: #{events.size} events"
+    puts "*" * 80
+    BROKER.produce_many_sync(events.map { { payload: _1.to_json, topic: } })
+  end
 end
