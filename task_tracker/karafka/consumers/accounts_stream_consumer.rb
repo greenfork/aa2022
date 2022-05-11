@@ -2,12 +2,7 @@
 
 class AccountsStreamConsumer < ApplicationConsumer
   def consume
-    puts "*" * 80
     messages.each do |message|
-      puts
-      pp message.payload
-      puts
-
       data = message.payload["data"]
       case message.payload["name"]
       when "AccountCreated"
@@ -17,6 +12,13 @@ class AccountsStreamConsumer < ApplicationConsumer
           email: data["email"],
           public_id: data["public_id"]
         )
+      when "AccountUpdated"
+        Account.where(public_id: data["public_id"]).update(
+          email: data["email"],
+          full_name: data["full_name"]
+        )
+      when "AccountDeleted"
+        Account.where(public_id: data["public_id"]).delete
       end
     end
   end

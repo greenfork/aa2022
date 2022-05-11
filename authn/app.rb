@@ -167,7 +167,10 @@ class Authn < Roda
               Producer.call(
                 {
                   name: "AccountRoleChanged",
-                  data: { public_id: acc[:public_id], role: new_role }
+                  data: {
+                    public_id: acc[:public_id],
+                    role: new_role
+                  }
                 },
                 topic: "account-access-control"
               )

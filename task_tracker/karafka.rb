@@ -37,5 +37,8 @@ App.consumer_groups.draw do
     topic "accounts-stream" do
       consumer AccountsStreamConsumer
     end
+    topic "account-access-control" do
+      consumer AccountAccessControlConsumer
+    end
   end
 end
