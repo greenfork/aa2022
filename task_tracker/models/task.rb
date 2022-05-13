@@ -5,7 +5,7 @@ class Task < Sequel::Model
 
   many_to_one :account, primary_key: :public_id, key: :assignee_public_id
 
-  def self.shuffle
+  def self.shuffle_all_open
     random_employee_public_id =
       Account
       .random_employees

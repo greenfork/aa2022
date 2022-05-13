@@ -183,7 +183,7 @@ class TaskTracker < Roda
 
       r.is "shuffle", method: "post" do
         if can_shuffle?
-          shuffled_tasks = Task.shuffle
+          shuffled_tasks = Task.shuffle_all_open
           Producer.produce_many_single_topic(
             shuffled_tasks.map do |task|
               {
