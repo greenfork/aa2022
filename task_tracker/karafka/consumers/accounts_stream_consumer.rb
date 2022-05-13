@@ -4,7 +4,7 @@ class AccountsStreamConsumer < ApplicationConsumer
   def consume
     messages.each do |message|
       data = message.payload["data"]
-      case message.payload["name"]
+      case message.payload["event_name"]
       when "AccountCreated"
         Account.create(
           full_name: data["full_name"],

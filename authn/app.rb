@@ -88,7 +88,7 @@ class Authn < Roda
       acc = Account.first(id: account[:id])
       Producer.call(
         {
-          name: "AccountCreated",
+          event_name: "AccountCreated",
           data: {
             public_id: acc[:public_id],
             email: acc[:email],
@@ -154,7 +154,7 @@ class Authn < Roda
             acc.update(full_name: r.params["name"], role: r.params["role"])
             Producer.call(
               {
-                name: "AccountUpdated",
+                event_name: "AccountUpdated",
                 data: {
                   public_id: acc[:public_id],
                   email: acc[:email],
@@ -166,7 +166,7 @@ class Authn < Roda
             if new_role
               Producer.call(
                 {
-                  name: "AccountRoleChanged",
+                  event_name: "AccountRoleChanged",
                   data: {
                     public_id: acc[:public_id],
                     role: new_role
@@ -184,7 +184,7 @@ class Authn < Roda
           acc.destroy
           Producer.call(
             {
-              name: "AccountDeleted",
+              event_name: "AccountDeleted",
               data: { public_id: acc.public_id }
             },
             topic: "accounts-stream"

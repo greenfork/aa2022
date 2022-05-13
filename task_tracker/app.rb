@@ -133,7 +133,7 @@ class TaskTracker < Roda
           task = Task.create(assignee_public_id: random_employee_public_id, description: "Lorem ipsum")
           Producer.call(
             {
-              name: "TaskCreated",
+              event_name: "TaskCreated",
               data: {
                 public_id: task.public_id,
                 actor_public_id: @current_account.public_id,
@@ -146,7 +146,7 @@ class TaskTracker < Roda
           )
           Producer.call(
             {
-              name: "TaskAdded",
+              event_name: "TaskAdded",
               data: {
                 public_id: task.public_id,
                 actor_public_id: @current_account.public_id,
@@ -169,7 +169,7 @@ class TaskTracker < Roda
           task.close
           Producer.call(
             {
-              name: "TaskClosed",
+              event_name: "TaskClosed",
               data: {
                 actor_public_id: @current_account.public_id,
                 public_id: task.public_id
@@ -187,7 +187,7 @@ class TaskTracker < Roda
           Producer.call(
             shuffled_tasks.map do |task|
               {
-                name: "TaskShuffled",
+                event_name: "TaskShuffled",
                 data: {
                   actor_public_id: @current_account.public_id,
                   public_id: task[:public_id],
