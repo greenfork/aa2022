@@ -118,93 +118,6 @@ class TaskTracker < Roda
     end
 
     #
-    # CRUD
-    #
-
-    r.on "tasks" do
-      @page_title = "Tasks"
-
-      r.is do
-        r.get do
-          view "index", locals: { tasks: Task.eager(:account).all }
-        end
-        r.post do
-          random_employee_public_id = Account.random_employees.get(:public_id)
-          task = Task.create(assignee_public_id: random_employee_public_id, description: "Lorem ipsum")
-          Producer.call(
-            {
-              event_name: "TaskCreated",
-              data: {
-                public_id: task.public_id,
-                actor_public_id: @current_account.public_id,
-                description: task.description,
-                assignee_public_id: task.assignee_public_id,
-                status: task.status
-              }
-            },
-            topic: "tasks-stream"
-          )
-          Producer.call(
-            {
-              event_name: "TaskAdded",
-              data: {
-                public_id: task.public_id,
-                actor_public_id: @current_account.public_id,
-                assignee_public_id: task.assignee_public_id
-              }
-            },
-            topic: "task-lifecycle"
-          )
-          r.redirect "/tasks"
-        end
-      end
-
-      r.is "my" do
-        view "index", locals: { tasks: @current_account.tasks }
-      end
-
-      r.is Integer, "close" do |id|
-        task = Task.first(id:)
-        if can_close?(task)
-          task.close
-          Producer.call(
-            {
-              event_name: "TaskClosed",
-              data: {
-                actor_public_id: @current_account.public_id,
-                public_id: task.public_id
-              }
-            },
-            topic: "task-lifecycle"
-          )
-        end
-        r.redirect "/tasks"
-      end
-
-      r.is "shuffle", method: "post" do
-        if can_shuffle?
-          shuffled_tasks = Task.shuffle_all_open
-          Producer.call(
-            shuffled_tasks.map do |task|
-              {
-                event_name: "TaskShuffled",
-                data: {
-                  actor_public_id: @current_account.public_id,
-                  public_id: task[:public_id],
-                  assignee_public_id: task[:assignee_public_id]
-                }
-              }
-            end,
-            topic: "task-lifecycle"
-          )
-        else
-          flash[:error] = "Not authorized"
-        end
-        r.redirect "/tasks"
-      end
-    end
-
-    #
     # OAuth
     #
 
@@ -294,6 +207,95 @@ class TaskTracker < Roda
 
       flash["notice"] = "You are logged out!"
       r.redirect "/"
+    end
+
+    r.redirect "/" unless @logged_in
+
+    #
+    # CRUD
+    #
+
+    r.on "tasks" do
+      @page_title = "Tasks"
+
+      r.is do
+        r.get do
+          view "index", locals: { tasks: Task.eager(:account).all }
+        end
+        r.post do
+          random_employee_public_id = Account.random_employees.get(:public_id)
+          task = Task.create(assignee_public_id: random_employee_public_id, description: "Lorem ipsum")
+          Producer.call(
+            {
+              event_name: "TaskCreated",
+              data: {
+                public_id: task.public_id,
+                actor_public_id: @current_account.public_id,
+                description: task.description,
+                assignee_public_id: task.assignee_public_id,
+                status: task.status
+              }
+            },
+            topic: "tasks-stream"
+          )
+          Producer.call(
+            {
+              event_name: "TaskAdded",
+              data: {
+                public_id: task.public_id,
+                actor_public_id: @current_account.public_id,
+                assignee_public_id: task.assignee_public_id
+              }
+            },
+            topic: "task-lifecycle"
+          )
+          r.redirect "/tasks"
+        end
+      end
+
+      r.is "my" do
+        view "index", locals: { tasks: @current_account.tasks }
+      end
+
+      r.is Integer, "close" do |id|
+        task = Task.first(id:)
+        if can_close?(task)
+          task.close
+          Producer.call(
+            {
+              event_name: "TaskClosed",
+              data: {
+                actor_public_id: @current_account.public_id,
+                public_id: task.public_id
+              }
+            },
+            topic: "task-lifecycle"
+          )
+        end
+        r.redirect "/tasks"
+      end
+
+      r.is "shuffle", method: "post" do
+        if can_shuffle?
+          shuffled_tasks = Task.shuffle_all_open
+          Producer.call(
+            shuffled_tasks.map do |task|
+              {
+                event_name: "TaskShuffled",
+                data: {
+                  actor_public_id: @current_account.public_id,
+                  public_id: task[:public_id],
+                  assignee_public_id: task[:assignee_public_id]
+                }
+              }
+            end,
+            topic: "task-lifecycle"
+          )
+        else
+          flash[:error] = "Not authorized"
+        end
+        r.redirect "/tasks"
+      end
     end
   end
 
