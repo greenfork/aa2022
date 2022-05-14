@@ -1,5 +1,3 @@
-#\ -p 9293
-
 # frozen_string_literal: true
 
 dev = ENV["RACK_ENV"] == "development"

@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+$stdout.sync = true
+
 begin
   require_relative ".env"
 rescue LoadError # rubocop:disable Lint/SuppressedException
@@ -14,8 +16,9 @@ Bundler.require(:default, ENV.fetch("KARAFKA_ENV", nil))
 # Karafka framework configuration
 APP_LOADER = Zeitwerk::Loader.new
 
-%w[karafka/consumers].each(&APP_LOADER.method(:push_dir))
+APP_LOADER.push_dir("#{__dir__}/karafka/consumers")
 
+APP_LOADER.enable_reloading
 APP_LOADER.setup
 APP_LOADER.eager_load
 
@@ -29,7 +32,7 @@ class App < Karafka::App
 end
 
 Karafka.producer.monitor.subscribe(WaterDrop::Instrumentation::LoggerListener.new(Karafka.logger))
-Karafka.monitor.subscribe(Karafka::Instrumentation::LoggerListener.new)
+# Karafka.monitor.subscribe(Karafka::Instrumentation::LoggerListener.new)
 Karafka.monitor.subscribe(Karafka::Instrumentation::ProctitleListener.new)
 
 App.consumer_groups.draw do

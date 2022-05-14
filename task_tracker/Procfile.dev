@@ -1,0 +1,2 @@
+web: bundle exec rackup --port 9297
+karafka: bundle exec karafka server

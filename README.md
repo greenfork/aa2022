@@ -39,6 +39,12 @@ bundle
 bundle exec karafka server
 ```
 
+Shortcuts for when everything is set up:
+```shell
+sudo docker compose up
+bin/start
+```
+
 Proceed to any desired URL:
 - `http://localhost:9293` - authn, authentication and authorization
 - `http://localhost:9297` - task tracker, managing tasks
