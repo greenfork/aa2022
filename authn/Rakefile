@@ -166,7 +166,7 @@ task "seed" do
       client_secret: BCrypt::Engine.hash_secret(TASK_TRACKER_CLIENT_ID, SALT),
       name: "Task tracker",
       description: "Application to make popugs work",
-      redirect_uri: "http://localhost:9297/callback",
+      redirect_uri: "http://localhost:9297/oauth/callback",
       homepage_url: "http://localhost:9297",
       scopes: "profile.read",
       account_id: account.id

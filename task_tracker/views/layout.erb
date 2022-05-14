@@ -25,13 +25,13 @@
           <% end %>
           <div class="ms-auto">
             <% if @logged_in %>
-              <form action="/logout" method="post">
-                <%== csrf_tag("/logout") %>
+              <form action="/oauth/logout" method="post">
+                <%== csrf_tag("/oauth/logout") %>
                 <input class="btn btn-outline-primary" type="submit" value="Logout" />
               </form>
             <% else %>
-              <form action="/authorize" method="post">
-                <%== csrf_tag("/authorize") %>
+              <form action="/oauth/authorize" method="post">
+                <%== csrf_tag("/oauth/authorize") %>
                 <button class="btn btn-outline-success" type="submit">Authorize</button>
               </form>
             <% end %>
