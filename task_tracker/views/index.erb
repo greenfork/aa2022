@@ -1,1 +1,42 @@
-<h1>Hello World!</h1>
+<div class="f-dlex">
+  <form action="/tasks" method="post" class="d-inline-block">
+    <%== csrf_tag("/tasks") %>
+    <input type="submit" class="btn btn-outline-primary" value="Add task">
+  </form>
+  <% if can_shuffle? %>
+    <form action="/tasks/shuffle" method="post" class="d-inline-block">
+      <%== csrf_tag("/tasks/shuffle") %>
+      <input type="submit" class="btn btn-outline-secondary" value="Shuffle tasks">
+    </form>
+  <% end %>
+</div>
+
+<table class="table align-middle">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Assignee</th>
+      <th>Description</th>
+      <th>Status</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% tasks.each do |t| %>
+      <tr>
+        <td><%= t.id %></td>
+        <td><%= t.account&.full_name || t.assignee_public_id %></td>
+        <td><%= t.description %></td>
+        <td><%= t.status.capitalize %></td>
+        <td>
+          <% if can_close?(t) %>
+            <form action="/tasks/<%= t.id %>/close" method="post">
+              <%== csrf_tag("/tasks/#{t.id}/close") %>
+              <input type="submit" class="btn btn-outline-success" value="Close">
+            </form>
+          <% end %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

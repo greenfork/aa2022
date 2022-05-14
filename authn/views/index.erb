@@ -1,2 +1,31 @@
-<h1>Hello World!</h1>
-<%= ENV["RACK_ENV"] %>
+<table class="table align-middle">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Public ID</th>
+      <th>Name</th>
+      <th>Email</th>
+      <th>Role</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% accounts.each do |acc| %>
+      <tr>
+        <td><%= acc.id %></td>
+        <td><%= acc.public_id %></td>
+        <td><%= acc.full_name %></td>
+        <td><%= acc.email %></td>
+        <td><%= acc.role %></td>
+        <td><a href="/accounts/<%= acc.id %>">Edit</a></td>
+        <td>
+          <form action="/accounts/<%= acc.id %>/delete" method="post">
+            <%== csrf_tag("/accounts/#{acc.id}/delete") %>
+            <input type="submit" class="btn btn-outline-danger" value="Delete">
+          </form>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

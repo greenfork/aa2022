@@ -2,10 +2,52 @@
 
 Educational project on asynchronous architecture.
 
-# Day 0
+Open `.drawio` files via <https://app.diagrams.net/>.
 
-[plan-v0.drawio](https://app.diagrams.net/#Uhttps%3A%2F%2Fraw.githubusercontent.com%2Fgreenfork%2Faa2022%2Fmaster%2Fplan-v0.drawio) - initial attempt at drawing the project architecture.
+## How to run
 
-# Week 1
+Requirements:
+- Ruby 3.1+
+- PostgreSQL (tested with 14.2, should be 12+)
+- Docker, docker-compose
 
-[plan-v1.drawio](https://app.diagrams.net/#Uhttps%3A%2F%2Fraw.githubusercontent.com%2Fgreenfork%2Faa2022%2Fmaster%2Fplan-v1.drawio) - diagrams after the first lessons.
+```shell
+# Kafka docker image with Zookeeper
+# From project root, in a separate terminal
+sudo docker compose up
+
+# Authn
+# From project root, in a separate terminal
+cd authn
+bundle
+bundle exec rake dev_up
+bundle exec rake seed
+bundle exec rackup
+
+# Task tracker
+# From project root, in a separate terminal
+cd task_tracker
+bundle
+bundle exec rake dev_up
+bundle exec rake seed
+bundle exec rackup
+
+# Task tracker's Kafka listener
+# From project root, in a separate terminal
+cd task_tracker
+bundle
+bundle exec karafka server
+```
+
+Shortcuts for when everything is set up:
+```shell
+sudo docker compose up
+bin/start
+```
+
+Proceed to any desired URL:
+- `http://localhost:9293` - authn, authentication and authorization
+- `http://localhost:9297` - task tracker, managing tasks
+
+Login with `admin@authn.com`:`password` for admin account.
+Login with `employee1@authn.com`:`password` for employee account.

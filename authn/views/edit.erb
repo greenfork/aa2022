@@ -1,0 +1,16 @@
+<form action="/accounts/<%= account.id %>" method="post">
+  <%== csrf_tag("/accounts/#{account.id}") %>
+  <div class="mb-3">
+    <label for="name" class="form-label">Name</label>
+    <input type="text" class="form-control" id="name" name="name" value="<%= account.full_name %>">
+  </div>
+  <div class="mb-3">
+    <label for="role" class="form-label">Role</label>
+    <select id="role" name="role" class="form-select" aria-label="Default select example">
+      <% Account::ROLES.each do |role| %>
+        <option <%= "selected" if role == account.role %> value="<%= role %>"><%= role.capitalize %></option>
+      <% end %>
+    </select>
+  </div>
+  <button type="submit" class="btn btn-primary">Update</button>
+</form>
