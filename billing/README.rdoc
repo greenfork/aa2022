@@ -1,0 +1,8 @@
+# Billing service
+
+```
+bundle
+bundle exec rake dev_up
+bundle exec rake seed
+bundle exec rackup
+```
