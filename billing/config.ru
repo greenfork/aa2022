@@ -8,16 +8,16 @@ if dev
 end
 
 require "rack/unreloader"
-Unreloader = Rack::Unreloader.new(subclasses: %w[Roda Sequel::Model], logger:, reload: dev) { App }
+Unreloader = Rack::Unreloader.new(subclasses: %w[Roda Sequel::Model], logger:, reload: dev) { Billing }
 require_relative "models"
-Unreloader.require("app.rb") { "App" }
+Unreloader.require("app.rb") { "Billing" }
 
 unless ENV["RACK_ENV"] == "development"
   Sequel::Model.freeze_descendents
   DB.freeze
 end
 
-run(dev ? Unreloader : App.freeze.app)
+run(dev ? Unreloader : Billing.freeze.app)
 
 freeze_core = !dev # Uncomment to enable refrigerator
 if freeze_core

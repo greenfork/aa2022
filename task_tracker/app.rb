@@ -6,7 +6,7 @@ require "roda"
 require "tilt/sass"
 
 class TaskTracker < Roda
-  APP_URL = "http://localhost:9297"
+  APP_URL = "http://localhost:9294"
   AUTHN_URL = "http://localhost:9293"
 
   opts[:check_dynamic_arity] = false

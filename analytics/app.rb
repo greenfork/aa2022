@@ -5,7 +5,10 @@ require_relative "models"
 require "roda"
 require "tilt/sass"
 
-class App < Roda
+class Analytics < Roda
+  APP_URL = "http://localhost:9296"
+  AUTHN_URL = "http://localhost:9293"
+
   opts[:check_dynamic_arity] = false
   opts[:check_arity] = :warn
 
@@ -19,7 +22,7 @@ class App < Roda
   plugin :content_security_policy do |csp|
     csp.default_src :none
     csp.style_src :self, "https://cdn.jsdelivr.net"
-    csp.form_action :self
+    csp.form_action :self, AUTHN_URL
     csp.script_src :self
     csp.connect_src :self
     csp.base_uri :none
@@ -32,6 +35,7 @@ class App < Roda
   plugin :render, escape: true, layout: "./layout"
   plugin :view_options
   plugin :public
+  plugin :hash_routes
 
   logger = if ENV["RACK_ENV"] == "test"
              Class.new { def write(_) end }.new
@@ -72,14 +76,51 @@ class App < Roda
     end
   end
 
+  Unreloader.require( # rubocop:disable Lint/EmptyBlock
+    "routes",
+    delete_hook: proc { |f| hash_branch(File.basename(f).delete_suffix(".rb")) }
+  ) {}
+
   plugin :sessions,
-         key: "_App.session",
+         key: "_Analytics.session",
          # cookie_options: {secure: ENV['RACK_ENV'] != 'test'}, # Uncomment if only allowing https:// access
-         secret: ENV.send((ENV["RACK_ENV"] == "development" ? :[] : :delete), "APP_SESSION_SECRET")
+         secret: ENV.send((ENV["RACK_ENV"] == "development" ? :[] : :delete), "ANALYTICS_SESSION_SECRET")
 
   route do |r|
     r.public
     r.assets
     check_csrf!
+
+    #
+    # Authentication
+    #
+
+    @logged_in = !session["access_token"].nil?
+    if (token = session["access_token"])
+      session["account"] ||= json_request(
+        :get,
+        "#{AUTHN_URL}/accounts/current",
+        headers: { "authorization" => "Bearer #{token}" }
+      )
+      @current_account = Account.first(public_id: session["account"]["public_id"])
+      if @current_account.nil?
+        clear_session
+        @logged_in = false
+      end
+    end
+
+    r.root do
+      if @logged_in
+        view inline: "Analytics"
+      else
+        view inline: "You are not authorized"
+      end
+    end
+
+    #
+    # OAuth
+    #
+
+    r.hash_branches
   end
 end

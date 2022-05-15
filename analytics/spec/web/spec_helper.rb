@@ -19,14 +19,14 @@ else
   Refrigerator.freeze_core
 end
 
-App.plugin :not_found do
+Analytics.plugin :not_found do
   raise "404 - File Not Found"
 end
-App.plugin :error_handler do |e|
+Analytics.plugin :error_handler do |e|
   raise e
 end
 
-Capybara.app = App.freeze.app
+Capybara.app = Analytics.freeze.app
 Capybara.exact = true
 
 Sequel::Model.freeze_descendents

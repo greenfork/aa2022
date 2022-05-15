@@ -1,2 +1,4 @@
 authn: foreman start -f authn/Procfile.dev
 tasks: foreman start -f task_tracker/Procfile.dev
+billing: foreman start -f billing/Procfile.dev
+analytics: foreman start -f analytics/Procfile.dev

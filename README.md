@@ -11,18 +11,14 @@ Requirements:
 - PostgreSQL (tested with 14.2, should be 12+)
 - Docker, docker-compose
 
+Setup:
 ```shell
-# Kafka docker image with Zookeeper
-# From project root, in a separate terminal
-sudo docker compose up
-
 # Authn
 # From project root, in a separate terminal
 cd authn
 bundle
 bundle exec rake dev_up
 bundle exec rake seed
-bundle exec rackup
 
 # Task tracker
 # From project root, in a separate terminal
@@ -30,24 +26,36 @@ cd task_tracker
 bundle
 bundle exec rake dev_up
 bundle exec rake seed
-bundle exec rackup
 
-# Task tracker's Kafka listener
+# Billing
 # From project root, in a separate terminal
-cd task_tracker
+cd billing
 bundle
-bundle exec karafka server
+bundle exec rake dev_up
+bundle exec rake seed
+
+# Analytics
+# From project root, in a separate terminal
+cd analytics
+bundle
+bundle exec rake dev_up
+bundle exec rake seed
 ```
 
-Shortcuts for when everything is set up:
+Run:
 ```shell
+# In a separate terminal:
 sudo docker compose up
+
+# In a separate terminal:
 bin/start
 ```
 
 Proceed to any desired URL:
 - `http://localhost:9293` - authn, authentication and authorization
-- `http://localhost:9297` - task tracker, managing tasks
+- `http://localhost:9294` - task tracker, managing tasks
+- `http://localhost:9295` - billing
+- `http://localhost:9296` - analytics
 
 Login with `admin@authn.com`:`password` for admin account.
 Login with `employee1@authn.com`:`password` for employee account.

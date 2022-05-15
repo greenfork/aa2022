@@ -1,4 +1,4 @@
-CREATE USER app_name WITH SUPERUSER PASSWORD 'app_name';
-CREATE DATABASE app_name_development OWNER app_name;
-CREATE DATABASE app_name_test OWNER app_name;
-CREATE DATABASE app_name_production OWNER app_name;
+CREATE USER billing PASSWORD 'billing';
+CREATE DATABASE billing_development OWNER billing;
+CREATE DATABASE billing_test OWNER billing;
+CREATE DATABASE billing_production OWNER billing;

@@ -109,6 +109,8 @@ end
 
 SALT = "$2a$12$g1aexwSiRnKS3pd.56MZEO"
 TASK_TRACKER_CLIENT_ID = "TASK_TRACKER_CLIENT_ID"
+BILLING_CLIENT_ID = "BILLING_CLIENT_ID"
+ANALYTICS_CLIENT_ID = "ANALYTICS_CLIENT_ID"
 
 ADMIN_UUID = "045f2304-dd2d-44fe-bd22-f3bd5aa01e86"
 EMPLOYEE1_UUID = "fcf7daa9-2d17-4852-93a5-481f36bbd45d"
@@ -166,8 +168,28 @@ task "seed" do
       client_secret: BCrypt::Engine.hash_secret(TASK_TRACKER_CLIENT_ID, SALT),
       name: "Task tracker",
       description: "Application to make popugs work",
-      redirect_uri: "http://localhost:9297/oauth/callback",
-      homepage_url: "http://localhost:9297",
+      redirect_uri: "http://localhost:9294/oauth/callback",
+      homepage_url: "http://localhost:9294",
+      scopes: "profile.read",
+      account_id: account.id
+    )
+    DB[:oauth_applications].insert(
+      client_id: BILLING_CLIENT_ID,
+      client_secret: BCrypt::Engine.hash_secret(BILLING_CLIENT_ID, SALT),
+      name: "Billing",
+      description: "Billing, accounting software",
+      redirect_uri: "http://localhost:9295/oauth/callback",
+      homepage_url: "http://localhost:9295",
+      scopes: "profile.read",
+      account_id: account.id
+    )
+    DB[:oauth_applications].insert(
+      client_id: ANALYTICS_CLIENT_ID,
+      client_secret: BCrypt::Engine.hash_secret(ANALYTICS_CLIENT_ID, SALT),
+      name: "Analytics",
+      description: "Analytics software",
+      redirect_uri: "http://localhost:9296/oauth/callback",
+      homepage_url: "http://localhost:9296",
       scopes: "profile.read",
       account_id: account.id
     )

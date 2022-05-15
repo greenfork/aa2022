@@ -27,7 +27,7 @@ class App < Karafka::App
   setup do |config|
     config.concurrency = 5
     config.max_wait_time = 1_000
-    config.kafka = { "bootstrap.servers": ENV.fetch("KAFKA_HOST", ENV.delete("AUTHN_KARAFKA_BROKER_URL")) }
+    config.kafka = { "bootstrap.servers": ENV.fetch("KAFKA_HOST", ENV.delete("BILLING_KARAFKA_BROKER_URL")) }
   end
 end
 
@@ -37,5 +37,8 @@ Karafka.monitor.subscribe(Karafka::Instrumentation::ProctitleListener.new)
 
 App.consumer_groups.draw do
   consumer_group :batched_group do
+    topic "default" do
+      consumer ApplicationConsumer
+    end
   end
 end
