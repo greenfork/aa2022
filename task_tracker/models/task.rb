@@ -29,6 +29,7 @@ end
 #  status             | task_status | NOT NULL DEFAULT 'open'::task_status
 #  assignee_public_id | uuid        | NOT NULL
 #  public_id          | uuid        | NOT NULL DEFAULT gen_random_uuid()
+#  jira_id            | text        | NOT NULL DEFAULT ''::text
 # Indexes:
 #  tasks_pkey          | PRIMARY KEY btree (id)
 #  tasks_public_id_key | UNIQUE btree (public_id)

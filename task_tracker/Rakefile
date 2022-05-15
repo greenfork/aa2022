@@ -150,7 +150,7 @@ task "seed" do
     )
 
     Task.truncate(cascade: true)
-    Task.create(assignee_public_id: EMPLOYEE1_UUID, description: "My first task")
+    Task.create(assignee_public_id: EMPLOYEE1_UUID, description: "My first task", jira_id: "UBERPOP-42")
     Task.create(assignee_public_id: EMPLOYEE1_UUID, description: "My second task")
     Task.create(assignee_public_id: EMPLOYEE1_UUID, description: "My third task")
     Task.create(assignee_public_id: EMPLOYEE2_UUID, description: "Another task")

@@ -106,3 +106,46 @@ task "annotate" do
   require "sequel/annotate"
   Sequel::Annotate.annotate(Dir["models/**/*.rb"])
 end
+
+ADMIN_UUID = "045f2304-dd2d-44fe-bd22-f3bd5aa01e86"
+EMPLOYEE1_UUID = "fcf7daa9-2d17-4852-93a5-481f36bbd45d"
+EMPLOYEE2_UUID = "f5bd070b-0b3c-43e5-b219-56b909e83e9b"
+EMPLOYEE3_UUID = "d70782e6-3156-4986-b441-6425cd469a07"
+ADMIN_EMAIL = "admin@authn.com"
+EMPLOYEE1_EMAIL = "employee1@authn.com"
+EMPLOYEE2_EMAIL = "employee2@authn.com"
+EMPLOYEE3_EMAIL = "employee3@authn.com"
+
+desc "Seed database with data for testing in development"
+task "seed" do
+  ENV["RACK_ENV"] = "development"
+  require_relative "models"
+
+  DB.transaction do
+    Account.truncate(cascade: true)
+    Account.create(
+      full_name: "Ivan Grozny",
+      role: "admin",
+      email: ADMIN_EMAIL,
+      public_id: ADMIN_UUID
+    )
+    Account.create(
+      full_name: "Ivan Kalita",
+      role: "employee",
+      email: EMPLOYEE1_EMAIL,
+      public_id: EMPLOYEE1_UUID
+    )
+    Account.create(
+      full_name: "Vladimir Veliky",
+      role: "employee",
+      email: EMPLOYEE2_EMAIL,
+      public_id: EMPLOYEE2_UUID
+    )
+    Account.create(
+      full_name: "Vladimir Krasno Solnyshko",
+      role: "employee",
+      email: EMPLOYEE3_EMAIL,
+      public_id: EMPLOYEE3_UUID
+    )
+  end
+end

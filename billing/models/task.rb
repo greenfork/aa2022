@@ -4,6 +4,15 @@ class Task < Sequel::Model
   STATUSES = %w[open closed].freeze
 
   many_to_one :account, primary_key: :public_id, key: :assignee_public_id
+
+  def self.add(assignee_public_id:, description:)
+    jira_id = ""
+    if (id = description[/\[[^\]]+\]/])
+      jira_id = id[1..-2]
+      description = description[id.size..].strip
+    end
+    Task.create(assignee_public_id:, description:, jira_id:)
+  end
 end
 
 # Table: tasks
@@ -14,6 +23,7 @@ end
 #  assignee_public_id | uuid          | NOT NULL
 #  public_id          | uuid          | NOT NULL DEFAULT gen_random_uuid()
 #  cost               | numeric(10,2) | NOT NULL
+#  jira_id            | text          | NOT NULL DEFAULT ''::text
 # Indexes:
 #  tasks_pkey          | PRIMARY KEY btree (id)
 #  tasks_public_id_key | UNIQUE btree (public_id)

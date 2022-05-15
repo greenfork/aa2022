@@ -137,7 +137,7 @@ class TaskTracker < Roda
         end
         r.post do
           random_employee_public_id = Account.random_employees.get(:public_id)
-          task = Task.create(assignee_public_id: random_employee_public_id, description: "Lorem ipsum")
+          task = Task.add(assignee_public_id: random_employee_public_id, description: "[UBERPOP-42] Lorem ipsum")
           Producer.call(
             {
               event_name: "TaskCreated",
@@ -145,6 +145,7 @@ class TaskTracker < Roda
                 public_id: task.public_id,
                 actor_public_id: @current_account.public_id,
                 description: task.description,
+                jira_id: task.jira_id,
                 assignee_public_id: task.assignee_public_id,
                 status: task.status
               }
