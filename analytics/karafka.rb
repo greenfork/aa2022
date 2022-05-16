@@ -22,6 +22,17 @@ APP_LOADER.enable_reloading
 APP_LOADER.setup
 APP_LOADER.eager_load
 
+require "avro_turf/messaging"
+require_relative "../schema_registry/registry"
+
+AVRO = AvroTurf::Messaging.new(registry: Registry.new)
+
+class AvroDeserializer
+  def self.call(message)
+    AVRO.decode(message.raw_payload)
+  end
+end
+
 # App class
 class App < Karafka::App
   setup do |config|

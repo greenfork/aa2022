@@ -1,0 +1,46 @@
+{
+    "name": "account_role_changed",
+    "type": "record",
+    "fields": [
+        {
+            "name": "event_name",
+            "type": "string"
+        },
+        {
+            "name": "event_id",
+            "type": "string",
+            "logicalType": "uuid"
+        },
+        {
+            "name": "event_version",
+            "type": "int"
+        },
+        {
+            "name": "event_timestamp",
+            "type": "long",
+            "logicalType": "timestamp-millis"
+        },
+        {
+            "name": "producer",
+            "type": "string"
+        },
+        {
+            "name": "data",
+            "type": {
+                "name": "data",
+                "type": "record",
+                "fields": [
+                    {
+                        "name": "public_id",
+                        "type": "string",
+                        "logicalType": "uuid"
+                    },
+                    {
+                        "name": "role",
+                        "type": "string"
+                    }
+                ]
+            }
+        }
+    ]
+}

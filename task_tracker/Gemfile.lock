@@ -3,6 +3,11 @@ GEM
   specs:
     addressable (2.8.0)
       public_suffix (>= 2.0.2, < 5.0)
+    avro (1.11.0)
+      multi_json (~> 1.0)
+    avro_turf (1.5.0)
+      avro (>= 1.7.7, < 1.12)
+      excon (~> 0.71)
     capybara (3.37.1)
       addressable
       matrix
@@ -53,6 +58,7 @@ GEM
       dry-initializer (~> 3.0)
       dry-schema (~> 1.9, >= 1.9.1)
     erubi (1.10.0)
+    excon (0.92.3)
     ffi (1.15.5)
     karafka (2.0.0.alpha6)
       dry-configurable (~> 0.13)
@@ -70,6 +76,7 @@ GEM
       minitest (> 5)
     minitest-hooks (1.5.0)
       minitest (> 5.3)
+    multi_json (1.15.0)
     nio4r (2.5.8)
     nokogiri (1.13.6-x86_64-linux)
       racc (~> 1.4)
@@ -116,7 +123,9 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
+  avro_turf
   capybara
+  dry-inflector
   erubi (>= 1.5)
   karafka (>= 2.0.0.alpha2)
   minitest (>= 5.7.0)

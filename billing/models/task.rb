@@ -4,15 +4,6 @@ class Task < Sequel::Model
   STATUSES = %w[open closed].freeze
 
   many_to_one :account, primary_key: :public_id, key: :assignee_public_id
-
-  def self.add(assignee_public_id:, description:)
-    jira_id = ""
-    if (id = description[/\[[^\]]+\]/])
-      jira_id = id[1..-2]
-      description = description[id.size..].strip
-    end
-    Task.create(assignee_public_id:, description:, jira_id:)
-  end
 end
 
 # Table: tasks
