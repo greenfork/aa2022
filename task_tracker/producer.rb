@@ -45,6 +45,8 @@ class Producer
           }
         end
       )
+    else
+      raise "Not compatible type"
     end
   end
 end

@@ -8,6 +8,7 @@ rescue LoadError # rubocop:disable Lint/SuppressedException
 end
 
 require_relative "models"
+require_relative "serializer"
 
 ENV["KARAFKA_ENV"] ||= "development"
 Bundler.require(:default, ENV.fetch("KARAFKA_ENV", nil))
@@ -22,14 +23,9 @@ APP_LOADER.enable_reloading
 APP_LOADER.setup
 APP_LOADER.eager_load
 
-require "avro_turf/messaging"
-require_relative "../schema_registry/registry"
-
-AVRO = AvroTurf::Messaging.new(registry: Registry.new)
-
 class AvroDeserializer
   def self.call(message)
-    AVRO.decode(message.raw_payload)
+    SERIALIZER.decode(message.raw_payload)
   end
 end
 
@@ -43,13 +39,24 @@ class App < Karafka::App
 end
 
 Karafka.producer.monitor.subscribe(WaterDrop::Instrumentation::LoggerListener.new(Karafka.logger))
-# Karafka.monitor.subscribe(Karafka::Instrumentation::LoggerListener.new)
+Karafka.monitor.subscribe(Karafka::Instrumentation::LoggerListener.new)
 Karafka.monitor.subscribe(Karafka::Instrumentation::ProctitleListener.new)
 
 App.consumer_groups.draw do
   consumer_group :batched_group do
-    topic "default" do
-      consumer ApplicationConsumer
+    topic "accounts-stream" do
+      consumer AccountsStreamConsumer
+      deserializer AvroDeserializer
+    end
+
+    topic "tasks-stream" do
+      consumer TasksStreamConsumer
+      deserializer AvroDeserializer
+    end
+
+    topic "task-lifecycle" do
+      consumer TaskLifecycleConsumer
+      deserializer AvroDeserializer
     end
   end
 end

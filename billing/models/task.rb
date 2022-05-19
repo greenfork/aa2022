@@ -2,8 +2,70 @@
 
 class Task < Sequel::Model
   STATUSES = %w[open closed].freeze
+  COST = -> { rand(20..40) }.freeze
+  WITHDRAW = -> { rand(10..20) }.freeze
 
   many_to_one :account, primary_key: :public_id, key: :assignee_public_id
+
+  def self.add(public_id:, assignee_public_id:)
+    DB.transaction do
+      task = for_update.first(public_id:)
+      if task.nil?
+        task = create(public_id:, assignee_public_id:, cost: COST.call)
+      else
+        task.update(cost: COST.call)
+      end
+      tr = Transaction.create(
+        account_public_id: assignee_public_id,
+        account_type: "debit",
+        type: "enrollment",
+        amount: WITHDRAW.call
+      )
+      [task, tr]
+    end
+  end
+
+  def self.close(public_id:)
+    DB.transaction do
+      task = for_update.first(public_id:)
+      raise "Implement retry in 10 minutes" if task.nil?
+      raise "Double event" if task.status == "open"
+      return if task.cost.nil?
+
+      task.update(status: "closed")
+      tr = Transaction.create(
+        account_public_id: task.assignee_public_id,
+        account_type: "credit",
+        type: "withdrawal",
+        amount: task.cost
+      )
+      [task, tr]
+    end
+  end
+
+  def self.change_assignee(public_id:, assignee_public_id:)
+    DB.transaction do
+      task = for_update.first(public_id:)
+      task = create(public_id:) if task.nil?
+
+      task.update(assignee_public_id:)
+      tr = Transaction.create(
+        account_public_id: assignee_public_id,
+        account_type: "debit",
+        type: "enrollment",
+        amount: WITHDRAW.call
+      )
+      [task, tr]
+    end
+  end
+
+  def self.create_or_update(attrs)
+    DB.transaction do
+      task = for_update.first(public_id: attrs["public_id"])
+      task = create(public_id: attrs["public_id"]) if task.nil?
+      task.update_fields(attrs, %w[assignee_public_id description jira_id status])
+    end
+  end
 end
 
 # Table: tasks

@@ -4,6 +4,12 @@ class Account < Sequel::Model
   ROLES = %w[employee manager accountant admin].freeze
 
   one_to_many :tasks, primary_key: :public_id, key: :assignee_public_id
+
+  dataset_module do
+    def employees
+      where(role: "employee")
+    end
+  end
 end
 
 # Table: accounts

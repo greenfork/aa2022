@@ -8,10 +8,10 @@ Sequel.migration do
     create_table(:tasks) do
       primary_key :id
       String :description, null: false, default: ""
-      task_status :status, null: false, default: "open"
-      uuid :assignee_public_id, null: false
+      task_status :status
+      uuid :assignee_public_id
       uuid :public_id, null: false, unique: true, default: Sequel.function(:gen_random_uuid)
-      BigDecimal :cost, size: [10, 2], null: false
+      BigDecimal :cost, size: [10, 2]
     end
   end
 
