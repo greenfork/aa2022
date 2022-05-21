@@ -43,25 +43,6 @@ class Transaction < Sequel::Model
       .select { Sequel.as(sum(:credit) - sum(:debit), :dif) }
       .first.values[:dif] || 0
   end
-
-  def self.close_billing_cycle
-    Account.each do |account|
-      balance = employee_balance("alltime", account.public_id)
-      next if balance <= 0
-
-      DB.transaction do
-        tr = create(
-          account_public_id: account.public_id,
-          type: "payment",
-          credit: balance
-        )
-        Payment.create(
-          transaction_public_id: tr.public_id,
-          status: "scheduled"
-        )
-      end
-    end
-  end
 end
 
 # Table: transactions

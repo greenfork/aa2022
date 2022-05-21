@@ -19,7 +19,6 @@ Sequel.migration do
       end
       String :full_name, null: false, default: ""
       account_role :role, null: false, default: "employee"
-      Integer :billing_cycle, null: false, default: 24, comment: "in hours"
     end
   end
 
