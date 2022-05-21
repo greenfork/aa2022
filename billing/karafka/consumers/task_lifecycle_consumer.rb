@@ -7,8 +7,8 @@ class TaskLifecycleConsumer < ApplicationConsumer
   def consume
     messages.each do |message|
       data = message.payload["data"]
-      case message.payload["event_name"]
-      when "TaskAdded"
+      case [message.payload["event_name"], message.payload["event_version"]]
+      when ["TaskAdded", 1]
         task, transaction = Task.add(
           public_id: data["public_id"],
           assignee_public_id: data["assignee_public_id"]
@@ -30,12 +30,12 @@ class TaskLifecycleConsumer < ApplicationConsumer
         )
         producer.produce_sync(topic: "task-billing-stream", payload: task_payload)
         producer.produce_sync(topic: "billing-transactions", payload: transaction_payload(task, transaction))
-      when "TaskClosed"
+      when ["TaskClosed", 1]
         task, transaction = Task.close(public_id: data["public_id"])
         unless task.nil?
           producer.produce_sync(topic: "billing-transactions", payload: transaction_payload(task, transaction))
         end
-      when "TaskShuffled"
+      when ["TaskShuffled", 1]
         task, transaction = Task.change_assignee(
           public_id: data["public_id"],
           assignee_public_id: data["assignee_public_id"]
