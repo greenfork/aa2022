@@ -8,6 +8,7 @@ rescue LoadError # rubocop:disable Lint/SuppressedException
 end
 
 require_relative "models"
+require_relative "serializer"
 
 ENV["KARAFKA_ENV"] ||= "development"
 Bundler.require(:default, ENV.fetch("KARAFKA_ENV", nil))
@@ -22,9 +23,16 @@ APP_LOADER.enable_reloading
 APP_LOADER.setup
 APP_LOADER.eager_load
 
+class AvroDeserializer
+  def self.call(message)
+    SERIALIZER.decode(message.raw_payload)
+  end
+end
+
 # App class
 class App < Karafka::App
   setup do |config|
+    config.client_id = "billing"
     config.concurrency = 5
     config.max_wait_time = 1_000
     config.kafka = { "bootstrap.servers": ENV.fetch("KAFKA_HOST", ENV.delete("BILLING_KARAFKA_BROKER_URL")) }
@@ -32,13 +40,29 @@ class App < Karafka::App
 end
 
 Karafka.producer.monitor.subscribe(WaterDrop::Instrumentation::LoggerListener.new(Karafka.logger))
-# Karafka.monitor.subscribe(Karafka::Instrumentation::LoggerListener.new)
+Karafka.monitor.subscribe(Karafka::Instrumentation::LoggerListener.new)
 Karafka.monitor.subscribe(Karafka::Instrumentation::ProctitleListener.new)
 
 App.consumer_groups.draw do
   consumer_group :batched_group do
-    topic "default" do
-      consumer ApplicationConsumer
+    topic "accounts-stream" do
+      consumer AccountsStreamConsumer
+      deserializer AvroDeserializer
+    end
+
+    topic "account-access-control" do
+      consumer AccountAccessControlConsumer
+      deserializer AvroDeserializer
+    end
+
+    topic "tasks-stream" do
+      consumer TasksStreamConsumer
+      deserializer AvroDeserializer
+    end
+
+    topic "task-lifecycle" do
+      consumer TaskLifecycleConsumer
+      deserializer AvroDeserializer
     end
   end
 end

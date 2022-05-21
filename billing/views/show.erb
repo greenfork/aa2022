@@ -1,0 +1,22 @@
+<strong>Balance:</strong> <%= Transaction.employee_balance("today", account.public_id) %>
+
+<table class="table align-middle mt-3">
+  <thead>
+    <tr>
+      <th>Date</th>
+      <th>Type</th>
+      <th>Debit</th>
+      <th>Credit</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% transactions.each do |t| %>
+      <tr>
+        <td><%= t.performed_at %></td>
+        <td><%= t.type %></td>
+        <td><%= t.debit %></td>
+        <td><%= t.credit %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

@@ -22,9 +22,21 @@ APP_LOADER.enable_reloading
 APP_LOADER.setup
 APP_LOADER.eager_load
 
+require "avro_turf/messaging"
+require_relative "../schema_registry/registry"
+
+AVRO = AvroTurf::Messaging.new(registry: Registry.new)
+
+class AvroDeserializer
+  def self.call(message)
+    AVRO.decode(message.raw_payload)
+  end
+end
+
 # App class
 class App < Karafka::App
   setup do |config|
+    config.client_id = "analytics"
     config.concurrency = 5
     config.max_wait_time = 1_000
     config.kafka = { "bootstrap.servers": ENV.fetch("KAFKA_HOST", ENV.delete("ANALYTICS_KARAFKA_BROKER_URL")) }

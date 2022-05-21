@@ -22,9 +22,21 @@ APP_LOADER.enable_reloading
 APP_LOADER.setup
 APP_LOADER.eager_load
 
+require "avro_turf/messaging"
+require_relative "../schema_registry/registry"
+
+AVRO = AvroTurf::Messaging.new(registry: Registry.new)
+
+class AvroDeserializer
+  def self.call(message)
+    AVRO.decode(message.raw_payload)
+  end
+end
+
 # App class
 class App < Karafka::App
   setup do |config|
+    config.client_id = "task_tracker"
     config.concurrency = 5
     config.max_wait_time = 1_000
     config.kafka = { "bootstrap.servers": ENV.fetch("KAFKA_HOST", ENV.delete("AUTHN_KARAFKA_BROKER_URL")) }
@@ -32,16 +44,19 @@ class App < Karafka::App
 end
 
 Karafka.producer.monitor.subscribe(WaterDrop::Instrumentation::LoggerListener.new(Karafka.logger))
-# Karafka.monitor.subscribe(Karafka::Instrumentation::LoggerListener.new)
+Karafka.monitor.subscribe(Karafka::Instrumentation::LoggerListener.new)
 Karafka.monitor.subscribe(Karafka::Instrumentation::ProctitleListener.new)
 
 App.consumer_groups.draw do
   consumer_group :batched_group do
     topic "accounts-stream" do
       consumer AccountsStreamConsumer
+      deserializer AvroDeserializer
     end
+
     topic "account-access-control" do
       consumer AccountAccessControlConsumer
+      deserializer AvroDeserializer
     end
   end
 end

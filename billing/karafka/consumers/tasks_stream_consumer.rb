@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
-class AccountAccessControlConsumer < ApplicationConsumer
+class TasksStreamConsumer < ApplicationConsumer
   def consume
     messages.each do |message|
       data = message.payload["data"]
       case [message.payload["event_name"], message.payload["event_version"]]
-      when ["AccountRoleChanged", 1]
-        Account.where(public_id: data["public_id"]).update(role: data["role"])
+      when ["TaskCreated", 1]
+        Task.create_or_update(data)
       end
     end
   end

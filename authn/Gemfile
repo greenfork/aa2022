@@ -4,7 +4,9 @@ source "https://rubygems.org"
 
 ruby "~> 3.1"
 
+gem "avro_turf"
 gem "bcrypt"
+gem "dry-inflector"
 gem "erubi", ">= 1.5"
 gem "puma"
 gem "rack-unreloader", ">= 1.8"

@@ -5,6 +5,15 @@ class Task < Sequel::Model
 
   many_to_one :account, primary_key: :public_id, key: :assignee_public_id
 
+  def self.add(assignee_public_id:, description:)
+    jira_id = ""
+    if (id = description[/\[[^\]]+\]/])
+      jira_id = id[1..-2]
+      description = description[id.size..].strip
+    end
+    create(assignee_public_id:, description:, jira_id:)
+  end
+
   def self.shuffle_all_open
     random_employee_public_id =
       Account
@@ -29,6 +38,7 @@ end
 #  status             | task_status | NOT NULL DEFAULT 'open'::task_status
 #  assignee_public_id | uuid        | NOT NULL
 #  public_id          | uuid        | NOT NULL DEFAULT gen_random_uuid()
+#  jira_id            | text        | NOT NULL DEFAULT ''::text
 # Indexes:
 #  tasks_pkey          | PRIMARY KEY btree (id)
 #  tasks_public_id_key | UNIQUE btree (public_id)

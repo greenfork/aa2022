@@ -111,7 +111,7 @@ class Billing < Roda
 
     r.root do
       if @logged_in
-        view inline: "Billing information"
+        r.redirect "/billing"
       else
         view inline: "You are not authorized"
       end
@@ -122,5 +122,28 @@ class Billing < Roda
     #
 
     r.hash_branches
+
+    r.redirect "/" unless @logged_in
+
+    r.on "billing" do
+      r.is do
+        r.redirect "/billing/#{@current_account.id}" unless admin_access?
+        view "index", locals: { employees: Account.employees }
+      end
+
+      r.is Integer do |account_id|
+        r.redirect "/billing/#{@current_account.id}" if !admin_access? && @current_account.id != account_id
+        account = Account.first(id: account_id)
+        @page_title = account.full_name.empty? ? account.public_id : account.full_name
+        view "show", locals: {
+          transactions: Transaction.today.where(account_public_id: account.public_id).order(:performed_at),
+          account:
+        }
+      end
+    end
+  end
+
+  def admin_access?
+    @current_account.role == "admin" || @current_account.role == "accountant"
   end
 end

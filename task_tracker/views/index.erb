@@ -25,7 +25,7 @@
     <% tasks.each do |t| %>
       <tr>
         <td><%= t.id %></td>
-        <td><%= t.account&.full_name || t.assignee_public_id %></td>
+        <td><%= t.account.nil? ? t.assignee_public_id : (t.account.full_name.empty? ? t.assignee_public_id : t.account.full_name) %></td>
         <td><%= t.description %></td>
         <td><%= t.status.capitalize %></td>
         <td>

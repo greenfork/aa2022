@@ -1,0 +1,50 @@
+{
+    "name": "task_cost_created",
+    "type": "record",
+    "fields": [
+        {
+            "name": "event_name",
+            "type": "string"
+        },
+        {
+            "name": "event_id",
+            "type": "string",
+            "logicalType": "uuid"
+        },
+        {
+            "name": "event_version",
+            "type": "int"
+        },
+        {
+            "name": "event_timestamp",
+            "type": "long",
+            "logicalType": "timestamp-millis"
+        },
+        {
+            "name": "producer",
+            "type": "string"
+        },
+        {
+            "name": "data",
+            "type": {
+                "name": "data",
+                "type": "record",
+                "fields": [
+                    {
+                        "name": "task_public_id",
+                        "type": "string",
+                        "logicalType": "uuid"
+                    },
+                    {
+                        "name": "cost",
+                        "type": "int"
+                    },
+                    {
+                        "name": "reward",
+                        "type": "int"
+                    }
+                ]
+            }
+        }
+    ]
+}
