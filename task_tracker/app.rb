@@ -149,8 +149,7 @@ class TaskTracker < Roda
                 actor_public_id: @current_account.public_id,
                 description: task.description,
                 jira_id: task.jira_id,
-                assignee_public_id: task.assignee_public_id,
-                status: task.status
+                assignee_public_id: task.assignee_public_id
               }
             },
             topic: "tasks-stream"
@@ -160,7 +159,6 @@ class TaskTracker < Roda
               event_name: "TaskAdded",
               data: {
                 public_id: task.public_id,
-                actor_public_id: @current_account.public_id,
                 assignee_public_id: task.assignee_public_id
               }
             },
@@ -200,7 +198,6 @@ class TaskTracker < Roda
               {
                 event_name: "TaskShuffled",
                 data: {
-                  actor_public_id: @current_account.public_id,
                   public_id: task[:public_id],
                   assignee_public_id: task[:assignee_public_id]
                 }

@@ -36,11 +36,6 @@
                         "logicalType": "uuid"
                     },
                     {
-                        "name": "actor_public_id",
-                        "type": "string",
-                        "logicalType": "uuid"
-                    },
-                    {
                         "name": "assignee_public_id",
                         "type": "string",
                         "logicalType": "uuid"

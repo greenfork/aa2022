@@ -22,7 +22,8 @@ class TaskLifecycleConsumer < ApplicationConsumer
             producer: "billing",
             data: {
               task_public_id: task.public_id,
-              cost: task.cost
+              cost: task.cost,
+              reward: task.reward
             }
           },
           subject: "task_cost_created",

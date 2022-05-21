@@ -52,14 +52,6 @@
                     {
                         "name": "jira_id",
                         "type": "string"
-                    },
-                    {
-                        "name": "status",
-                        "type": {
-                            "name": "status",
-                            "type": "enum",
-                            "symbols": ["open", "closed"]
-                        }
                     }
                 ]
             }

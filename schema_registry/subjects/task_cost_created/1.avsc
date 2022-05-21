@@ -37,7 +37,11 @@
                     },
                     {
                         "name": "cost",
-                        "type": "double"
+                        "type": "int"
+                    },
+                    {
+                        "name": "reward",
+                        "type": "int"
                     }
                 ]
             }
