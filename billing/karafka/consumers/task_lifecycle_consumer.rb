@@ -28,7 +28,7 @@ class TaskLifecycleConsumer < ApplicationConsumer
           subject: "task_cost_created",
           version: 1
         )
-        producer.produce_sync(topic: "task-billing-stream", payload: task_payload)
+        producer.produce_sync(topic: "task-costs-stream", payload: task_payload)
         producer.produce_sync(topic: "billing-transactions", payload: transaction_payload(task, transaction))
       when ["TaskClosed", 1]
         task, transaction = Task.close(public_id: data["public_id"])
