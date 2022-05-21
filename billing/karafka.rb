@@ -32,6 +32,7 @@ end
 # App class
 class App < Karafka::App
   setup do |config|
+    config.client_id = "billing"
     config.concurrency = 5
     config.max_wait_time = 1_000
     config.kafka = { "bootstrap.servers": ENV.fetch("KAFKA_HOST", ENV.delete("BILLING_KARAFKA_BROKER_URL")) }
@@ -46,6 +47,11 @@ App.consumer_groups.draw do
   consumer_group :batched_group do
     topic "accounts-stream" do
       consumer AccountsStreamConsumer
+      deserializer AvroDeserializer
+    end
+
+    topic "account-access-control" do
+      consumer AccountAccessControlConsumer
       deserializer AvroDeserializer
     end
 

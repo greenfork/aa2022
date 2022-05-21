@@ -8,6 +8,7 @@ Sequel.migration do
       uuid :assignee_public_id
       uuid :public_id, null: false, unique: true, default: Sequel.function(:gen_random_uuid)
       Integer :cost
+      Integer :reward
     end
   end
 end

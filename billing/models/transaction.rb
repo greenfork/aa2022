@@ -1,44 +1,37 @@
 # frozen_string_literal: true
 
 class Transaction < Sequel::Model
-  PROFIT = Sequel.lit(
-    "coalesce(sum(amount) FILTER (WHERE account_type = 'debit'), 0) - "\
-    "coalesce(sum(amount) FILTER (WHERE account_type = 'credit'), 0) AS dif"
-  ).freeze
-  UNPROFIT = Sequel.lit(
-    "coalesce(sum(amount) FILTER (WHERE account_type = 'credit'), 0) - "\
-    "coalesce(sum(amount) FILTER (WHERE account_type = 'debit'), 0) AS dif"
-  ).freeze
-
   dataset_module do
     def today
-      now = Time.now.utc
-      beginning_of_day = Time.utc(now.year, now.month, now.day)
+      now = Time.now
+      beginning_of_day = Time.new(now.year, now.month, now.day)
       where(performed_at: beginning_of_day..now)
     end
   end
 
   def self.top_management_profit(time_period_human)
-    now = Time.now.utc
+    now = Time.now
     time_period =
       case time_period_human
       when "today"
-        beginning_of_day = Time.utc(now.year, now.month, now.day)
+        beginning_of_day = Time.new(now.year, now.month, now.day)
         beginning_of_day..now
       when "alltime"
         Time.at(0)..now
       else
         raise "Not implemented"
       end
-    where(performed_at: time_period).select(PROFIT).first.values[:dif] || 0
+    where(performed_at: time_period)
+      .select { Sequel.as(sum(:debit) - sum(:credit), :dif) }
+      .first.values[:dif] || 0
   end
 
   def self.employee_balance(time_period_human, employee_public_id)
-    now = Time.now.utc
+    now = Time.now
     time_period =
       case time_period_human
       when "today"
-        beginning_of_day = Time.utc(now.year, now.month, now.day)
+        beginning_of_day = Time.new(now.year, now.month, now.day)
         beginning_of_day..now
       when "alltime"
         Time.at(0)..now
@@ -47,7 +40,8 @@ class Transaction < Sequel::Model
       end
     where(performed_at: time_period)
       .where(account_public_id: employee_public_id)
-      .select(UNPROFIT).first.values[:dif] || 0
+      .select { Sequel.as(sum(:credit) - sum(:debit), :dif) }
+      .first.values[:dif] || 0
   end
 end
 

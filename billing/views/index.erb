@@ -1,6 +1,6 @@
 <% if admin_access? %>
   <strong>Top-management profit:</strong>
-  <%= Transaction.top_management_profit("today").to_i %>
+  <%= Transaction.top_management_profit("today") %>
 <% end %>
 
 <table class="table align-middle mt-3">
@@ -15,7 +15,7 @@
     <% employees.each do |e| %>
       <tr>
         <td><a href="/billing/<%= e.id %>"><%= e.full_name.empty? ? e.public_id : e.full_name %></a></td>
-        <td><%= Transaction.employee_balance("today", e.public_id).to_i %></td>
+        <td><%= Transaction.employee_balance("today", e.public_id) %></td>
         <td>
           <form action="/billing/<%= e.id %>/fire" method="post">
             <%== csrf_tag("/billing/#{e.id}/fire") %>

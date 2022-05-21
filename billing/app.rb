@@ -127,12 +127,12 @@ class Billing < Roda
 
     r.on "billing" do
       r.is do
-        r.redirect @current_account.id unless admin_access?
+        r.redirect "/billing/#{@current_account.id}" unless admin_access?
         view "index", locals: { employees: Account.employees }
       end
 
       r.is Integer do |account_id|
-        r.redirect @current_account.id if !admin_access? && @current_account.id != account_id
+        r.redirect "/billing/#{@current_account.id}" if !admin_access? && @current_account.id != account_id
         account = Account.first(id: account_id)
         @page_title = account.full_name.empty? ? account.public_id : account.full_name
         view "show", locals: {

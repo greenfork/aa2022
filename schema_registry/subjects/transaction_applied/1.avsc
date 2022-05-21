@@ -46,24 +46,20 @@
                         "logicalType": "uuid"
                     },
                     {
-                        "name": "account_type",
-                        "type": {
-                            "name": "account_type",
-                            "type": "enum",
-                            "symbols": ["debit", "credit"]
-                        }
-                    },
-                    {
                         "name": "type",
                         "type": {
                             "name": "type",
                             "type": "enum",
-                            "symbols": ["enrollment", "withdrawal", "payment"]
+                            "symbols": ["deposit", "withdraw", "payment"]
                         }
                     },
                     {
-                        "name": "amount",
-                        "type": "double"
+                        "name": "debit",
+                        "type": "int"
+                    },
+                    {
+                        "name": "credit",
+                        "type": "int"
                     },
                     {
                         "name": "performed_at",

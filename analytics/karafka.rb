@@ -36,6 +36,7 @@ end
 # App class
 class App < Karafka::App
   setup do |config|
+    config.client_id = "analytics"
     config.concurrency = 5
     config.max_wait_time = 1_000
     config.kafka = { "bootstrap.servers": ENV.fetch("KAFKA_HOST", ENV.delete("ANALYTICS_KARAFKA_BROKER_URL")) }

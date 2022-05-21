@@ -33,7 +33,7 @@ class TaskLifecycleConsumer < ApplicationConsumer
         producer.produce_sync(topic: "billing-transactions", payload: transaction_payload(task, transaction))
       when ["TaskClosed", 1]
         task, transaction = Task.close(public_id: data["public_id"])
-        unless task.nil?
+        if !task.nil? && !transaction.nil?
           producer.produce_sync(topic: "billing-transactions", payload: transaction_payload(task, transaction))
         end
       when ["TaskShuffled", 1]
@@ -41,7 +41,9 @@ class TaskLifecycleConsumer < ApplicationConsumer
           public_id: data["public_id"],
           assignee_public_id: data["assignee_public_id"]
         )
-        producer.produce_sync(topic: "billing-transactions", payload: transaction_payload(task, transaction))
+        if !task.nil? && !transaction.nil?
+          producer.produce_sync(topic: "billing-transactions", payload: transaction_payload(task, transaction))
+        end
       end
     end
   end
@@ -59,9 +61,9 @@ class TaskLifecycleConsumer < ApplicationConsumer
         public_id: transaction.public_id,
         task_public_id: task.public_id,
         account_public_id: transaction.account_public_id,
-        account_type: transaction.account_type,
         type: transaction.type,
-        amount: transaction.amount,
+        debit: transaction.debit,
+        credit: transaction.credit,
         performed_at: transaction.performed_at.to_i * 1000
       }
     }
