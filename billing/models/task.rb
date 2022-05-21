@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class Task < Sequel::Model
-  STATUSES = %w[open closed].freeze
   COST = -> { rand(20..40) }.freeze
   WITHDRAW = -> { rand(10..20) }.freeze
 
@@ -17,9 +16,8 @@ class Task < Sequel::Model
       end
       tr = Transaction.create(
         account_public_id: assignee_public_id,
-        account_type: "debit",
-        type: "enrollment",
-        amount: WITHDRAW.call
+        type: "deposit",
+        debit: WITHDRAW.call
       )
       [task, tr]
     end
@@ -35,9 +33,8 @@ class Task < Sequel::Model
       task.update(status: "closed")
       tr = Transaction.create(
         account_public_id: task.assignee_public_id,
-        account_type: "credit",
-        type: "withdrawal",
-        amount: task.cost
+        type: "withdraw",
+        credit: task.cost
       )
       [task, tr]
     end
@@ -51,9 +48,8 @@ class Task < Sequel::Model
       task.update(assignee_public_id:)
       tr = Transaction.create(
         account_public_id: assignee_public_id,
-        account_type: "debit",
-        type: "enrollment",
-        amount: WITHDRAW.call
+        type: "deposit",
+        debit: WITHDRAW.call
       )
       [task, tr]
     end
@@ -63,7 +59,7 @@ class Task < Sequel::Model
     DB.transaction do
       task = for_update.first(public_id: attrs["public_id"])
       task = create(public_id: attrs["public_id"]) if task.nil?
-      task.update_fields(attrs, %w[assignee_public_id description jira_id status])
+      task.update_fields(attrs, %w[assignee_public_id description jira_id])
     end
   end
 end
