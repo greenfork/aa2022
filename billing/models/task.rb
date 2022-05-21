@@ -68,6 +68,7 @@ end
 #  assignee_public_id | uuid    |
 #  public_id          | uuid    | NOT NULL DEFAULT gen_random_uuid()
 #  cost               | integer |
+#  reward             | integer |
 #  jira_id            | text    | NOT NULL DEFAULT ''::text
 # Indexes:
 #  tasks_pkey          | PRIMARY KEY btree (id)

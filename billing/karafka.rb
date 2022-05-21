@@ -40,7 +40,7 @@ class App < Karafka::App
 end
 
 Karafka.producer.monitor.subscribe(WaterDrop::Instrumentation::LoggerListener.new(Karafka.logger))
-Karafka.monitor.subscribe(Karafka::Instrumentation::LoggerListener.new)
+# Karafka.monitor.subscribe(Karafka::Instrumentation::LoggerListener.new)
 Karafka.monitor.subscribe(Karafka::Instrumentation::ProctitleListener.new)
 
 App.consumer_groups.draw do

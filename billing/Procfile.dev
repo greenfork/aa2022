@@ -1,2 +1,3 @@
 web: bundle exec rackup --port 9295
 karafka: bundle exec karafka server
+clock: bundle exec clock clock.rb
